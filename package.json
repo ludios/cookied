@@ -12,7 +12,6 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
-		"@fontsource/fira-mono": "^4.5.0",
 		"@neoconfetti/svelte": "^1.0.0",
 		"@playwright/test": "^1.25.0",
 		"@sveltejs/adapter-auto": "next",
