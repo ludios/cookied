@@ -33,7 +33,11 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@envelop/core": "^3.0.1",
+		"@envelop/graphql-jit": "^5.0.1",
+		"@graphql-yoga/common": "^2.12.12",
 		"@graphql-yoga/node": "^2.13.13",
+		"@graphql-yoga/render-graphiql": "^2.13.12",
 		"graphql": "^16.6.0"
 	}
 }
