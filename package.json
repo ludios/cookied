@@ -39,5 +39,10 @@
 		"@graphql-yoga/node": "^2.13.13",
 		"@graphql-yoga/render-graphiql": "^2.13.12",
 		"graphql": "^16.6.0"
+	},
+	"pnpm": {
+		"patchedDependencies": {
+			"@graphql-yoga/render-graphiql@2.13.12": "patches/@graphql-yoga__render-graphiql@2.13.12.patch"
+		}
 	}
 }
