@@ -38,6 +38,7 @@
 		"@graphql-yoga/common": "^2.12.12",
 		"@graphql-yoga/node": "^2.13.13",
 		"@graphql-yoga/render-graphiql": "^2.13.12",
+		"@pothos/core": "^3.22.6",
 		"graphql": "^16.6.0"
 	},
 	"pnpm": {
