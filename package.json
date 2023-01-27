@@ -46,6 +46,9 @@
 	"pnpm": {
 		"patchedDependencies": {
 			"@graphql-yoga/render-graphiql@2.13.12": "patches/@graphql-yoga__render-graphiql@2.13.12.patch"
+		},
+		"overrides": {
+			"esbuild": "^0.17.4"
 		}
 	}
 }
