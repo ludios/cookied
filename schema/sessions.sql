@@ -1,8 +1,14 @@
 CREATE TABLE sessions (
+    -- 128-bit hash of the 128-bit secret used to check whether this is really client's session
+    hashed_secret          uuid         NOT NULL,
     -- Limit of 1T can be raised if needed
-    id          bigint       GENERATED ALWAYS AS IDENTITY PRIMARY KEY CHECK (id >= 1 AND id < 1000000000000),
-    user_id     bigint       NOT NULL REFERENCES users (id),
-    birth_time  timestamptz  NOT NULL
+    id                     bigint       GENERATED ALWAYS AS IDENTITY PRIMARY KEY CHECK (id >= 1 AND id < 1000000000000),
+    -- Which user this session is for
+    user_id                bigint       NOT NULL REFERENCES users (id),
+    -- Time the session was created
+    birth_time             timestamptz  NOT NULL,
+    -- User agent at the time the session was created
+    user_agent_seen_first  text         NOT NULL
 );
 -- After we've stabilized the table a bit
 --SELECT periods.add_system_time_period('sessions', 'row_start', 'row_end');
