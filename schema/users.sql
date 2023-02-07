@@ -33,12 +33,15 @@ CREATE TABLE users (
     -- Limit of 1T can be raised if needed
     id               bigint           GENERATED ALWAYS AS IDENTITY PRIMARY KEY CHECK (id >= 1 AND id < 1000000000000),
     username         username         NOT NULL,
-    visual_username  visual_username  GENERATED ALWAYS AS (get_visual_username(username)) STORED,
+    visual_username  visual_username  NOT NULL GENERATED ALWAYS AS (get_visual_username(username)) STORED,
     creation_time    timestamptz      NOT NULL
 );
+
 -- After we've stabilized the table a bit
 --SELECT periods.add_system_time_period('users', 'row_start', 'row_end');
 --SELECT periods.add_system_versioning('users');
+
+CREATE UNIQUE INDEX users_visual_username_index ON users (visual_username);
 
 CREATE TRIGGER users_check_update
     BEFORE UPDATE ON users
