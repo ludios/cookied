@@ -14,4 +14,6 @@ $$ LANGUAGE plpgsql;
 
 -- A superuser should apply extensions.sql first
 
+\ir users.sql
+\ir sessions.sql
 \ir cards.sql
