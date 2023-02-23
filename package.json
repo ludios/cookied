@@ -12,12 +12,12 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.30.0",
+		"@playwright/test": "^1.31.0",
 		"@sveltejs/adapter-auto": "^2.0.0",
-		"@sveltejs/kit": "^1.6.0",
+		"@sveltejs/kit": "^1.8.3",
 		"@types/cookie": "^0.5.1",
-		"@typescript-eslint/eslint-plugin": "^5.52.0",
-		"@typescript-eslint/parser": "^5.52.0",
+		"@typescript-eslint/eslint-plugin": "^5.53.0",
+		"@typescript-eslint/parser": "^5.53.0",
 		"carbon-components-svelte": "^0.72.3",
 		"carbon-icons-svelte": "^11.4.0",
 		"carbon-preprocess-svelte": "^0.9.1",
@@ -31,16 +31,16 @@
 		"svelte-preprocess": "^4.10.7",
 		"tslib": "^2.5.0",
 		"typescript": "^4.9.5",
-		"vite": "^4.1.1"
+		"vite": "^4.1.4"
 	},
 	"type": "module",
 	"dependencies": {
-		"@envelop/core": "^3.0.4",
-		"@envelop/graphql-jit": "^5.0.4",
+		"@envelop/core": "^3.0.6",
+		"@envelop/graphql-jit": "^5.0.6",
 		"@graphql-yoga/common": "^2.12.12",
 		"@graphql-yoga/node": "^2.13.13",
 		"@graphql-yoga/render-graphiql": "^2.13.12",
-		"@pothos/core": "^3.25.0",
+		"@pothos/core": "^3.27.0",
 		"@pothos/plugin-prisma": "^3.41.0",
 		"@prisma/client": "^4.10.1",
 		"blake3-wasm": "^3.0.0",
@@ -51,7 +51,7 @@
 			"@graphql-yoga/render-graphiql@2.13.12": "patches/@graphql-yoga__render-graphiql@2.13.12.patch"
 		},
 		"overrides": {
-			"esbuild": "^0.17.8",
+			"esbuild": "^0.17.10",
 			"blake3-wasm": "^3.0.0",
 			"@c4312/blake3-internal": "^3.0.0"
 		}
