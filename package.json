@@ -12,26 +12,26 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.31.0",
+		"@playwright/test": "^1.32.1",
 		"@sveltejs/adapter-auto": "^2.0.0",
-		"@sveltejs/kit": "^1.8.3",
+		"@sveltejs/kit": "^1.14.0",
 		"@types/cookie": "^0.5.1",
-		"@typescript-eslint/eslint-plugin": "^5.53.0",
-		"@typescript-eslint/parser": "^5.53.0",
+		"@typescript-eslint/eslint-plugin": "^5.57.0",
+		"@typescript-eslint/parser": "^5.57.0",
 		"carbon-components-svelte": "^0.72.3",
 		"carbon-icons-svelte": "^11.4.0",
 		"carbon-preprocess-svelte": "^0.9.1",
-		"eslint": "^8.34.0",
-		"eslint-config-prettier": "^8.6.0",
+		"eslint": "^8.36.0",
+		"eslint-config-prettier": "^8.8.0",
 		"eslint-plugin-svelte3": "^4.0.0",
-		"prettier": "^2.8.4",
-		"prettier-plugin-svelte": "^2.9.0",
-		"svelte": "^3.55.1",
-		"svelte-check": "^3.0.3",
+		"prettier": "^2.8.7",
+		"prettier-plugin-svelte": "^2.10.0",
+		"svelte": "^3.57.0",
+		"svelte-check": "^3.1.4",
 		"svelte-preprocess": "^4.10.7",
 		"tslib": "^2.5.0",
 		"typescript": "^4.9.5",
-		"vite": "^4.1.4"
+		"vite": "^4.2.1"
 	},
 	"type": "module",
 	"dependencies": {
@@ -40,9 +40,9 @@
 		"@graphql-yoga/common": "^2.12.12",
 		"@graphql-yoga/node": "^2.13.13",
 		"@graphql-yoga/render-graphiql": "^2.13.12",
-		"@pothos/core": "^3.27.0",
-		"@pothos/plugin-prisma": "^3.41.0",
-		"@prisma/client": "^4.10.1",
+		"@pothos/core": "^3.29.0",
+		"@pothos/plugin-prisma": "^3.47.0",
+		"@prisma/client": "^4.11.0",
 		"blake3-wasm": "^3.0.0",
 		"graphql": "^16.6.0"
 	},
@@ -51,7 +51,7 @@
 			"@graphql-yoga/render-graphiql@2.13.12": "patches/@graphql-yoga__render-graphiql@2.13.12.patch"
 		},
 		"overrides": {
-			"esbuild": "^0.17.10",
+			"esbuild": "^0.17.14",
 			"blake3-wasm": "^3.0.0",
 			"@c4312/blake3-internal": "^3.0.0"
 		}
