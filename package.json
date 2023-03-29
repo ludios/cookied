@@ -49,7 +49,9 @@
 	},
 	"pnpm": {
 		"patchedDependencies": {
-			"@graphql-yoga/render-graphiql@2.13.12": "patches/@graphql-yoga__render-graphiql@2.13.12.patch"
+			"@graphql-yoga/render-graphiql@2.13.12": "patches/@graphql-yoga__render-graphiql@2.13.12.patch",
+			"@prisma/engines@4.12.0": "patches/@prisma__engines@4.12.0.patch",
+			"prisma@4.12.0": "patches/prisma@4.12.0.patch"
 		},
 		"overrides": {
 			"esbuild": "^0.17.14",
