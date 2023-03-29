@@ -1,9 +1,25 @@
 import type { Actions } from './$types';
+import { PrismaClient } from '@prisma/client';
+import { inspect } from 'util';
+
+function throwIfGt1(rows: Array<any>): Array<any> {
+	if (rows.length > 1) {
+		throw Error(`expected 0 or 1 rows, got ${rows.length} rows: ${inspect(rows)}`);
+	}
+	return rows;
+}
 
 export const actions = {
 	default: async (event) => {
 		const formData = await event.request.formData();
 		const username = formData.get("username");
-		console.log(username);
+
+		const prisma = new PrismaClient();
+		const users = throwIfGt1(await prisma.$queryRaw`SELECT * FROM cards.users WHERE username = ${username}`);
+		if (users.length && users[0].username === username) {
+			console.log(`Found user! ${inspect(users[0])}`);
+		} else {
+			console.log(`No such user (${username})!`);
+		}
 	}
 } satisfies Actions;
