@@ -12,10 +12,11 @@ function throwIfGt1(rows: Array<any>): Array<any> {
 export const actions = {
 	default: async (event) => {
 		const formData = await event.request.formData();
-		const username = formData.get("username");
+		const username = formData.get("username") as string;
 
 		const prisma = new PrismaClient();
-		const users = throwIfGt1(await prisma.$queryRaw`SELECT * FROM cards.users WHERE username = ${username}`);
+		// We have an index on LOWER(username) but not username
+		const users = throwIfGt1(await prisma.$queryRaw`SELECT * FROM cards.users WHERE LOWER(username) = ${username.toLowerCase()}`);
 		if (users.length && users[0].username === username) {
 			console.log(`Found user! ${inspect(users[0])}`);
 		} else {
