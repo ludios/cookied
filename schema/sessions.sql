@@ -1,12 +1,13 @@
 CREATE TABLE sessions (
     -- 128-bit hash of the 128-bit secret used to check whether this is really client's session
+    -- We use a uuid instead of bytea here to save one byte per row.
     hashed_secret          uuid         NOT NULL,
     -- Limit of 1T can be raised if needed
     id                     bigint       GENERATED ALWAYS AS IDENTITY PRIMARY KEY CHECK (id >= 1 AND id < 1000000000000),
     -- Which user this session is for
     user_id                bigint       NOT NULL REFERENCES users (id),
     -- Time the session was created
-    birth_time             timestamptz  NOT NULL,
+    birth_time             timestamptz  NOT NULL DEFAULT now(),
     -- User agent at the time the session was created
     user_agent_seen_first  text         NOT NULL
 );
@@ -26,3 +27,22 @@ CREATE TRIGGER sessions_forbid_truncate
 
 -- Set the index to use for future CLUSTER operations
 ALTER TABLE sessions CLUSTER ON sessions_pkey;
+
+CREATE FUNCTION bytea_to_uuid(bytes bytea) RETURNS uuid AS $$
+BEGIN
+    RETURN CAST(substring(CAST(bytes AS text) from 3) AS uuid);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE FUNCTION new_session(user_id_ bigint, user_agent_seen_first_ text) RETURNS RECORD AS $$
+DECLARE
+    secret_ bytea := gen_random_bytes(16);
+    hashed_secret_ bytea = substring(sha384(secret_) from 1 for 16);
+    id_ bigint;
+    ret RECORD;
+BEGIN
+    INSERT INTO sessions (hashed_secret, user_id, user_agent_seen_first) VALUES (bytea_to_uuid(hashed_secret_), user_id_, user_agent_seen_first_) RETURNING id INTO id_;
+    SELECT id_, secret_ INTO ret;
+    RETURN ret;
+END;
+$$ LANGUAGE plpgsql;
