@@ -1,3 +1,5 @@
+import { A } from "ayy";
+
 export class BadSessionCookieError extends Error {
 	constructor(message: string) {
 		super(message);
