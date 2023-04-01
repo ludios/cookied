@@ -13,7 +13,7 @@ export class SessionCookie {
 		this.secret = secret;
 	}
 
-	// Parse a cookie value with "session_id base64_secret"
+	// Parse a cookie value with "session_id unpadded_base64_secret"
 	static parse(s_cookie: string): SessionCookie {
 		const [session_id_string, unpadded_base64_secret] = s_cookie.split(" ", 2);
 		// len(str(2 ** 63 - 1)) = 19
@@ -30,5 +30,11 @@ export class SessionCookie {
 		const session_id = BigInt(session_id_string);
 		const secret = Buffer.from(unpadded_base64_secret, "base64");
 		return new SessionCookie(session_id, secret);
+	}
+
+	toString() {
+		const base64_secret = this.secret.toString("base64");
+		const unpadded_base64_secret = base64_secret.replace(/==?$/, "");
+		return `${this.id} ${unpadded_base64_secret}`;
 	}
 }
