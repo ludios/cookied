@@ -50,6 +50,14 @@
 		"graphql": "^16.6.0",
 		"postgres": "^3.3.4"
 	},
+	"ava": {
+		"extensions": {
+			"ts": "module"
+		},
+		"nodeArguments": [
+			"--loader=ts-node/esm"
+		]
+	},
 	"pnpm": {
 		"patchedDependencies": {
 			"@graphql-yoga/render-graphiql@2.13.12": "patches/@graphql-yoga__render-graphiql@2.13.12.patch",
