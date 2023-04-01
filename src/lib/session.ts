@@ -15,7 +15,7 @@ export class SessionCookie {
 
 	// Parse a cookie value with "session_id base64_secret"
 	static parse(s_cookie: string): SessionCookie {
-		const [session_id_string, base64_secret] = s_cookie.split(" ", 2);
+		const [session_id_string, unpadded_base64_secret] = s_cookie.split(" ", 2);
 		// len(str(2 ** 63 - 1)) = 19
 		// len("9223372036854775807") = 19
 		if (!/^[1-9][0-9]{0,18}$/.test(session_id_string)) {
@@ -24,10 +24,11 @@ export class SessionCookie {
 		// >>> ("\x00" * 16).encode("base64")
 		// 'AAAAAAAAAAAAAAAAAAAAAA==\n'
 		// but we put base64 without the == padding in the cookie.
-		if (!/^[+/A-Za-z0-9]{22}$/.test(base64_secret)) {
-			throw new BadSessionCookieError("base64_secret had wrong length or invalid characters");
+		if (!/^[+/A-Za-z0-9]{22}$/.test(unpadded_base64_secret)) {
+			throw new BadSessionCookieError("unpadded_base64_secret had wrong length or invalid characters");
 		}
 		const session_id = BigInt(session_id_string);
+		const base64_secret = `${unpadded_base64_secret}==`;
 		return new SessionCookie(session_id, base64_secret);
 	}
 }
