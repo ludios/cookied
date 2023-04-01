@@ -11,6 +11,9 @@ export class SessionCookie {
 	secret: Buffer;
 
 	constructor(id: bigint, secret: Buffer) {
+		A.gte(id, 1n);
+		A.lte(id, 2n ** 63n - 1n);
+		A.eq(secret.length, 16);
 		this.id = id;
 		this.secret = secret;
 	}
