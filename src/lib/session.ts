@@ -6,11 +6,11 @@ export class BadSessionCookieError extends Error {
 
 export class SessionCookie {
 	id: bigint;
-	base64_secret: string;
+	secret: Buffer;
 
-	constructor(id: bigint, base64_secret: string) {
+	constructor(id: bigint, secret: Buffer) {
 		this.id = id;
-		this.base64_secret = base64_secret;
+		this.secret = secret;
 	}
 
 	// Parse a cookie value with "session_id base64_secret"
@@ -28,7 +28,7 @@ export class SessionCookie {
 			throw new BadSessionCookieError("unpadded_base64_secret had wrong length or invalid characters");
 		}
 		const session_id = BigInt(session_id_string);
-		const base64_secret = `${unpadded_base64_secret}==`;
-		return new SessionCookie(session_id, base64_secret);
+		const secret = Buffer.from(unpadded_base64_secret, "base64");
+		return new SessionCookie(session_id, secret);
 	}
 }
