@@ -46,3 +46,8 @@ BEGIN
     RETURN ret;
 END;
 $$ LANGUAGE plpgsql;
+
+-- How will sessions be validated if we have e.g. caching of sessions in web servers?
+--
+-- Retrieve entire row from PostgreSQL
+-- Every time user sends secret, sha384 it and verify against cache or PostgreSQL
