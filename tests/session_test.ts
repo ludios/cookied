@@ -39,3 +39,8 @@ test("SessionCookie.toString", t => {
 		t.is(encoded, original);
 	}
 });
+
+test("SessionCookie.hashedSecret", t => {
+	const cookie = new SessionCookie(1n, Buffer.from("00000000000000000000000000000000", "hex"));
+	t.deepEqual(cookie.hashedSecret(), Buffer.from("ae40659da1193cdec8df474b5e36416a", "hex"));
+});
