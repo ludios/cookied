@@ -23,4 +23,19 @@ test("SessionCookie parse", t => {
 	t.throws(() => SessionCookie.parse("1 AAAAAAAAAAAAAAAAAAAAA"), {instanceOf: BadSessionCookieError, message: "unpadded_base64_secret had wrong length or invalid characters"});
 	t.throws(() => SessionCookie.parse("1 AAAAAAAAAA_AAAAAAAAAAA"), {instanceOf: BadSessionCookieError, message: "unpadded_base64_secret had wrong length or invalid characters"});
 	t.throws(() => SessionCookie.parse("1 AAAAAAAAAAAAAAAAAAAA=="), {instanceOf: BadSessionCookieError, message: "unpadded_base64_secret had wrong length or invalid characters"});
+	t.throws(() => SessionCookie.parse("1 /+ABCDEFGHIJKLMNO12345"), {instanceOf: BadSessionCookieError, message: "non-canonical base64 representation or extraneous data"});
+	t.throws(() => SessionCookie.parse("1 AAAAAAAAAAAAAAAAAAAAAA "), {instanceOf: BadSessionCookieError, message: "non-canonical base64 representation or extraneous data"});
+});
+
+test("SessionCookie toString", t => {
+	const valid_cookies = [
+		"1 AAAAAAAAAAAAAAAAAAAAAA",
+		"1 /+AAAAAAAAAAAAAAAAAAAA",
+		"12341234 /+ABCDEFGHIJKLMNO1234w",
+		"9223372036854775807 /+AAAAAAAAAAAAAAAAAAAA",
+	];
+	for (const original of valid_cookies) {
+		const encoded = SessionCookie.parse(original).toString();
+		t.is(encoded, original);
+	}
 });

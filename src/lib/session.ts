@@ -41,7 +41,11 @@ export class SessionCookie {
 			throw new BadSessionCookieError("session_id was invalid");
 		}
 		const secret = Buffer.from(unpadded_base64_secret, "base64");
-		return new SessionCookie(session_id, secret);
+		const cookie = new SessionCookie(session_id, secret);
+		if (cookie.toString() != s_cookie) {
+			throw new BadSessionCookieError("non-canonical base64 representation or extraneous data");
+		}
+		return cookie;
 	}
 
 	hashedSecret(): Buffer {
@@ -53,7 +57,7 @@ export class SessionCookie {
 		return hashed_secret;
 	}
 
-	toString() {
+	toString(): string {
 		const base64_secret = this.secret.toString("base64");
 		A.eq(base64_secret.length, 24);
 		A(base64_secret.endsWith("=="));
