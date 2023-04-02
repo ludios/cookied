@@ -48,6 +48,14 @@ export class SessionCookie {
 		return cookie;
 	}
 
+	toString(): string {
+		const base64_secret = this.secret.toString("base64");
+		A.eq(base64_secret.length, 24);
+		A(base64_secret.endsWith("=="));
+		const unpadded_base64_secret = base64_secret.substring(0, 22);
+		return `${this.id} ${unpadded_base64_secret}`;
+	}
+
 	hashedSecret(): Buffer {
 		const hash = createHash("sha384");
 		hash.update(this.secret);
@@ -55,13 +63,5 @@ export class SessionCookie {
 		// We need just 128 of the 384 bits
 		const hashed_secret = digest.subarray(0, 16);
 		return hashed_secret;
-	}
-
-	toString(): string {
-		const base64_secret = this.secret.toString("base64");
-		A.eq(base64_secret.length, 24);
-		A(base64_secret.endsWith("=="));
-		const unpadded_base64_secret = base64_secret.substring(0, 22);
-		return `${this.id} ${unpadded_base64_secret}`;
 	}
 }
