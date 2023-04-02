@@ -4,7 +4,7 @@ import { AssertionError } from "ayy";
 
 const fn = () => 'foo';
 
-test("SessionCookie constructor", t => {
+test("new SessionCookie", t => {
 	new SessionCookie(1n, Buffer.alloc(16));
 	t.throws(() => new SessionCookie(0n, Buffer.alloc(15)), {instanceOf: AssertionError}); // id < 1
 	t.throws(() => new SessionCookie(2n ** 64n, Buffer.alloc(16)), {instanceOf: AssertionError}); // id > 2 ** 63 - 1
@@ -12,7 +12,7 @@ test("SessionCookie constructor", t => {
 	t.throws(() => new SessionCookie(1n, Buffer.alloc(17)), {instanceOf: AssertionError}); // wrong secret length
 });
 
-test("SessionCookie parse", t => {
+test("SessionCookie.parse", t => {
 	t.deepEqual(SessionCookie.parse("1 AAAAAAAAAAAAAAAAAAAAAA"), new SessionCookie(1n, Buffer.from("00000000000000000000000000000000", "hex")));
 	t.deepEqual(SessionCookie.parse("1 /+AAAAAAAAAAAAAAAAAAAA"), new SessionCookie(1n, Buffer.from("ffe00000000000000000000000000000", "hex")));
 	t.deepEqual(SessionCookie.parse("9223372036854775807 /+AAAAAAAAAAAAAAAAAAAA"), new SessionCookie(9223372036854775807n, Buffer.from("ffe00000000000000000000000000000", "hex")));
@@ -27,7 +27,7 @@ test("SessionCookie parse", t => {
 	t.throws(() => SessionCookie.parse("1 AAAAAAAAAAAAAAAAAAAAAA "), {instanceOf: BadSessionCookieError, message: "non-canonical base64 representation or extraneous data"});
 });
 
-test("SessionCookie toString", t => {
+test("SessionCookie.toString", t => {
 	const valid_cookies = [
 		"1 AAAAAAAAAAAAAAAAAAAAAA",
 		"1 /+AAAAAAAAAAAAAAAAAAAA",
