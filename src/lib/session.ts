@@ -39,7 +39,9 @@ export class SessionCookie {
 
 	toString() {
 		const base64_secret = this.secret.toString("base64");
-		const unpadded_base64_secret = base64_secret.replace(/==?$/, "");
+		A.eq(base64_secret.length, 24);
+		A(base64_secret.endsWith("=="));
+		const unpadded_base64_secret = base64_secret.replace(/==$/, "");
 		return `${this.id} ${unpadded_base64_secret}`;
 	}
 }
