@@ -12,13 +12,13 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.32.1",
+		"@playwright/test": "^1.32.2",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.15.0",
 		"@types/cookie": "^0.5.1",
 		"@types/node": "^18.15.11",
-		"@typescript-eslint/eslint-plugin": "^5.57.0",
-		"@typescript-eslint/parser": "^5.57.0",
+		"@typescript-eslint/eslint-plugin": "^5.57.1",
+		"@typescript-eslint/parser": "^5.57.1",
 		"ava": "^5.2.0",
 		"carbon-components-svelte": "^0.72.3",
 		"carbon-icons-svelte": "^11.4.0",
@@ -47,7 +47,7 @@
 		"@pothos/core": "^3.29.0",
 		"@pothos/plugin-prisma": "^3.47.1",
 		"@prisma/client": "^4.12.0",
-		"ayy": "^2.0.0",
+		"ayy": "^3.0.0",
 		"blake3-wasm": "^3.0.0",
 		"graphql": "^16.6.0",
 		"postgres": "^3.3.4"
