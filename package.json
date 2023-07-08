@@ -62,7 +62,7 @@
 	},
 	"pnpm": {
 		"overrides": {
-			"esbuild": "^0.17.18",
+			"esbuild": "^0.18.11",
 			"blake3-wasm": "^3.0.0",
 			"@c4312/blake3-internal": "^3.0.0"
 		},
