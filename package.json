@@ -65,6 +65,9 @@
 			"esbuild": "^0.17.18",
 			"blake3-wasm": "^3.0.0",
 			"@c4312/blake3-internal": "^3.0.0"
+		},
+		"patchedDependencies": {
+			"@graphql-yoga/render-graphiql@4.0.3": "patches/@graphql-yoga__render-graphiql@4.0.3.patch"
 		}
 	}
 }
