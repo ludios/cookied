@@ -1,11 +1,7 @@
 import { A } from "ayy";
 import { createHash } from "node:crypto";
 
-export class BadSessionCookieError extends Error {
-	constructor(message: string) {
-		super(message);
-	}
-}
+export class BadSessionCookieError extends Error {}
 
 const MAX_SESSION_ID = 2n ** 63n - 1n;
 
@@ -42,7 +38,7 @@ export class SessionCookie {
 		}
 		const secret = Buffer.from(unpadded_base64_secret, "base64");
 		const cookie = new SessionCookie(session_id, secret);
-		if (cookie.toString() != s_cookie) {
+		if (cookie.toString() !== s_cookie) {
 			throw new BadSessionCookieError("non-canonical base64 representation or extraneous data");
 		}
 		return cookie;

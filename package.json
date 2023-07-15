@@ -56,9 +56,7 @@
 		"extensions": {
 			"ts": "module"
 		},
-		"nodeArguments": [
-			"--loader=tsx"
-		]
+		"nodeArguments": ["--loader=tsx"]
 	},
 	"pnpm": {
 		"overrides": {

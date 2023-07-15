@@ -1,6 +1,6 @@
-import type { Actions } from './$types';
-import { PrismaClient } from '@prisma/client';
-import { inspect } from 'util';
+import type { Actions } from "./$types";
+import { PrismaClient } from "@prisma/client";
+import { inspect } from "util";
 
 function throw_if_gt1(rows: Array<any>): Array<any> {
 	if (rows.length > 1) {
@@ -16,11 +16,13 @@ export const actions = {
 
 		const prisma = new PrismaClient();
 		// We have an index on LOWER(username) but not username
-		const users = throw_if_gt1(await prisma.$queryRaw`SELECT * FROM cards.users WHERE LOWER(username) = ${username.toLowerCase()}`);
+		const users = throw_if_gt1(
+			await prisma.$queryRaw`SELECT * FROM cards.users WHERE LOWER(username) = ${username.toLowerCase()}`,
+		);
 		if (users.length && users[0].username === username) {
 			console.log(`Found user! ${inspect(users[0])}`);
 		} else {
 			console.log(`No such user (${username})!`);
 		}
-	}
+	},
 } satisfies Actions;
