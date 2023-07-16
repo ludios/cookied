@@ -64,7 +64,8 @@
 			"@c4312/blake3-internal": "^3.0.0"
 		},
 		"patchedDependencies": {
-			"@graphql-yoga/render-graphiql@4.0.3": "patches/@graphql-yoga__render-graphiql@4.0.3.patch"
+			"@graphql-yoga/render-graphiql@4.0.3": "patches/@graphql-yoga__render-graphiql@4.0.3.patch",
+			"prisma@5.0.0": "patches/prisma@5.0.0.patch"
 		}
 	}
 }
