@@ -2,8 +2,6 @@ import test from "ava";
 import { SessionCookie, BadSessionCookieError } from "../src/lib/session.js";
 import { AssertionError } from "ayy";
 
-const fn = () => "foo";
-
 test("new SessionCookie", (t) => {
 	new SessionCookie(1n, Buffer.alloc(16));
 	t.throws(() => new SessionCookie(0n, Buffer.alloc(15)), { instanceOf: AssertionError }); // id < 1
