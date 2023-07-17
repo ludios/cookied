@@ -48,7 +48,6 @@
 		"@pothos/plugin-prisma": "^3.52.0",
 		"@prisma/client": "^5.0.0",
 		"ayy": "^3.0.0",
-		"blake3-wasm": "^3.0.0",
 		"graphql": "^16.7.1",
 		"postgres": "^3.3.5"
 	},
@@ -59,9 +58,7 @@
 	},
 	"pnpm": {
 		"overrides": {
-			"esbuild": "^0.18.13",
-			"blake3-wasm": "^3.0.0",
-			"@c4312/blake3-internal": "^3.0.0"
+			"esbuild": "^0.18.13"
 		},
 		"patchedDependencies": {
 			"@graphql-yoga/render-graphiql@4.0.3": "patches/@graphql-yoga__render-graphiql@4.0.3.patch",
