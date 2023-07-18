@@ -61,5 +61,3 @@ export class SessionCookie {
 		return hashed_secret;
 	}
 }
-
-// TODO: need to implement getting a session from PostgreSQL, checking if SessionCookie is actually in the database & which user it authenticates the client to be

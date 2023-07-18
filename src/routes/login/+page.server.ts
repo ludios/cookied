@@ -1,26 +1,33 @@
 import type { Actions } from "./$types";
 import { PrismaClient } from "@prisma/client";
+import { Session } from "$lib/db/session";
 import { inspect } from "util";
+import { SessionCookie } from "$lib/session";
+import { env, throwIfGt1 } from "$lib/util";
 
-function throw_if_gt1<T>(rows: Array<T>): Array<T> {
-	if (rows.length > 1) {
-		throw Error(`expected 0 or 1 rows, got ${rows.length} rows: ${inspect(rows)}`);
-	}
-	return rows;
-}
+const SESSION_COOKIE_NAME: string = env("SESSION_COOKIE_NAME");
+const SESSION_COOKIE_PATH: string = env("SESSION_COOKIE_PATH");
+const SESSION_COOKIE_SECURE: boolean = Boolean(Number(env("SESSION_COOKIE_SECURE")));
 
 export const actions = {
-	default: async (event) => {
-		const formData = await event.request.formData();
+	default: async ({ cookies, request }) => {
+		const formData = await request.formData();
 		const username = formData.get("username") as string;
 
 		const prisma = new PrismaClient();
 		// We have an index on LOWER(username) but not username
-		const users = throw_if_gt1(
-			await prisma.$queryRaw`SELECT * FROM cards.users WHERE LOWER(username) = ${username.toLowerCase()}` satisfies Array<{ username: string }>,
+		const users = throwIfGt1(
+			await prisma.$queryRaw`SELECT id, username FROM cards.users WHERE LOWER(username) = ${username.toLowerCase()}` satisfies Array<{ id: bigint, username: string }>,
 		);
 		if (users.length && users[0].username === username) {
 			console.log(`Found user! ${inspect(users[0])}`);
+
+			// Create a new session in the database
+			const { id, secret } = await Session.create(users[0].id, request.headers.get("User-Agent") || "");
+
+			// Set a session cookie in the HTTP response
+			const s_cookie = new SessionCookie(id, secret);
+			cookies.set(SESSION_COOKIE_NAME, s_cookie.toString(), { path: SESSION_COOKIE_PATH, secure: SESSION_COOKIE_SECURE });
 		} else {
 			console.log(`No such user (${username})!`);
 		}
