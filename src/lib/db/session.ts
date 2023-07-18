@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import type { SessionCookie } from "$lib/session";
 import { getOneRow } from "../util";
+import crypto from "node:crypto";
 
 const prisma = new PrismaClient();
 
@@ -24,7 +25,6 @@ export class Session {
 		if (!dbSession) {
 			return false;
 		}
-		// TODO constant time compare
-		return session.hashedSecret().equals(dbSession.hashed_secret);
+		return crypto.timingSafeEqual(session.hashedSecret(), dbSession.hashed_secret);
 	}
 }
