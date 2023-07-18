@@ -19,17 +19,18 @@ export const actions = {
 		const users = throwIfGt1(
 			await prisma.$queryRaw`SELECT id, username FROM cards.users WHERE LOWER(username) = ${username.toLowerCase()}` satisfies Array<{ id: bigint, username: string }>,
 		);
-		if (users.length && users[0].username === username) {
-			console.log(`Found user! ${inspect(users[0])}`);
-
-			// Create a new session in the database
-			const { id, secret } = await Session.create(users[0].id, request.headers.get("User-Agent") || "");
-
-			// Set a session cookie in the HTTP response
-			const s_cookie = new SessionCookie(id, secret);
-			cookies.set(SESSION_COOKIE_NAME, s_cookie.toString(), { path: SESSION_COOKIE_PATH, secure: SESSION_COOKIE_SECURE });
-		} else {
-			console.log(`No such user (${username})!`);
+		if (!(users.length && users[0].username === username)) {
+			console.log(`no such user`, { username });
+			return;
 		}
+		const user = users[0];
+		console.log(`Found user! ${inspect(user)}`);
+
+		// Create a new session in the database
+		const { id, secret } = await Session.create(user.id, request.headers.get("User-Agent") || "");
+
+		// Set a session cookie in the HTTP response
+		const s_cookie = new SessionCookie(id, secret);
+		cookies.set(SESSION_COOKIE_NAME, s_cookie.toString(), { path: SESSION_COOKIE_PATH, secure: SESSION_COOKIE_SECURE, priority: "high" });
 	},
 } satisfies Actions;
