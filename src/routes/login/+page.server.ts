@@ -17,7 +17,11 @@ export const actions = {
 		const prisma = new PrismaClient();
 		// We have an index on LOWER(username) but not username
 		const users = throwIfGt1(
-			await prisma.$queryRaw`SELECT id, username FROM cards.users WHERE LOWER(username) = ${username.toLowerCase()}` satisfies Array<{ id: bigint, username: string }>,
+			await prisma.$queryRaw`
+				SELECT id, username
+				FROM cards.users
+				WHERE LOWER(username) = ${username.toLowerCase()}
+			` satisfies Array<{ id: bigint, username: string }>,
 		);
 		if (!(users.length && users[0].username === username)) {
 			console.log(`no such user`, { username });
@@ -31,6 +35,10 @@ export const actions = {
 
 		// Set a session cookie in the HTTP response
 		const s_cookie = new SessionCookie(id, secret);
-		cookies.set(SESSION_COOKIE_NAME, s_cookie.toString(), { path: SESSION_COOKIE_PATH, secure: SESSION_COOKIE_SECURE, priority: "high" });
+		cookies.set(SESSION_COOKIE_NAME, s_cookie.toString(), {
+			path: SESSION_COOKIE_PATH,
+			secure: SESSION_COOKIE_SECURE,
+			priority: "high",
+		});
 	},
 } satisfies Actions;
