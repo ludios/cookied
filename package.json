@@ -46,6 +46,7 @@
 		"@prisma/client": "^5.0.0",
 		"ayy": "^3.0.0",
 		"graphql": "^16.7.1",
+		"hash-wasm": "^4.9.0",
 		"postgres": "^3.3.5"
 	},
 	"ava": {
