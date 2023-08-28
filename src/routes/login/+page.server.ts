@@ -1,9 +1,9 @@
-import type { Actions } from "./$types";
-import { PrismaClient } from "@prisma/client";
-import { Session } from "$lib/db/session";
 import { inspect } from "util";
+import { Session } from "$lib/db/session";
 import { SessionCookie } from "$lib/session";
 import { env, throwIfGt1 } from "$lib/util";
+import { PrismaClient } from "@prisma/client";
+import type { Actions } from "./$types";
 
 const SESSION_COOKIE_NAME: string = env("SESSION_COOKIE_NAME");
 const SESSION_COOKIE_PATH: string = env("SESSION_COOKIE_PATH");
@@ -17,14 +17,14 @@ export const actions = {
 		const prisma = new PrismaClient();
 		// We have an index on LOWER(username) but not username
 		const users = throwIfGt1(
-			await prisma.$queryRaw`
+			(await prisma.$queryRaw`
 				SELECT id, username
 				FROM cards.users
 				WHERE LOWER(username) = ${username.toLowerCase()}
-			` satisfies Array<{ id: bigint, username: string }>,
+			`) satisfies Array<{ id: bigint; username: string }>,
 		);
 		if (!(users.length && users[0].username === username)) {
-			console.log(`no such user`, { username });
+			console.log("no such user", { username });
 			return;
 		}
 		const user = users[0];
