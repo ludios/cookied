@@ -36,8 +36,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@envelop/core": "^4.0.3",
-		"@envelop/graphql-jit": "^6.0.5",
+		"@envelop/core": "^5.0.0",
+		"@envelop/graphql-jit": "^8.0.1",
 		"@graphql-yoga/common": "^3.9.1",
 		"@graphql-yoga/node": "^3.9.1",
 		"@graphql-yoga/render-graphiql": "^4.0.5",
