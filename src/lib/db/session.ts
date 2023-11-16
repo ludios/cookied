@@ -30,18 +30,18 @@ export class Session {
 	}
 
 	static async validate(session: SessionCookie): Promise<MinimizedDatabaseSession | null> {
-		const dbSession = await Session.byId(session.id);
-		if (!dbSession) {
+		const db_session = await Session.byId(session.id);
+		if (!db_session) {
 			return null;
 		}
-		if (!crypto.timingSafeEqual(session.hashedSecret(), dbSession.hashed_secret)) {
+		if (!crypto.timingSafeEqual(session.hashedSecret(), db_session.hashed_secret)) {
 			return null;
 		}
 		return {
-			id: Number(dbSession.id),
-			user_id: Number(dbSession.user_id),
-			birth_time: dbSession.birth_time,
-			user_agent_seen_first: dbSession.user_agent_seen_first,
+			id: Number(db_session.id),
+			user_id: Number(db_session.user_id),
+			birth_time: db_session.birth_time,
+			user_agent_seen_first: db_session.user_agent_seen_first,
 		};
 	}
 }
