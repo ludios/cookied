@@ -23,7 +23,8 @@ export const actions = {
 				WHERE LOWER(username) = ${username.toLowerCase()}
 			`) satisfies Array<{ id: bigint; username: string }>,
 		);
-		if (!(users.length && users[0].username === username)) {
+		// Sanity-check the row from the database: ensure username match
+		if (!(users.length && users[0].username.toLowerCase() === username.toLowerCase())) {
 			console.log("no such user", { username });
 			return;
 		}
