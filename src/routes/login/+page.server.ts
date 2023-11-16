@@ -11,8 +11,8 @@ const SESSION_COOKIE_SECURE: boolean = Boolean(Number(env("SESSION_COOKIE_SECURE
 
 export const actions = {
 	default: async ({ cookies, request }) => {
-		const formData = await request.formData();
-		const username = formData.get("username") as string;
+		const form_data = await request.formData();
+		const username = form_data.get("username") as string;
 
 		const prisma = new PrismaClient();
 		// We have an index on LOWER(username) but not username
