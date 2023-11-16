@@ -17,16 +17,24 @@ export class Session {
 		return prisma.sessions.findUnique({ where: { id: session_id } });
 	}
 
-	static async create(userId: bigint, userAgent: string): Promise<{ id: bigint; secret: Buffer }> {
+	static async create(user_id: bigint, user_agent: string): Promise<{ id: bigint; secret: Buffer }> {
 		// Prisma is unable to get a record ("Failed to deserialize column of type 'record'"),
 		// so convert the record to some columns.
 		return get_one_row(
 			(await prisma.$queryRaw`
-			SELECT id, secret
-			FROM cards.new_session(${userId}, ${userAgent})
-			AS (id bigint, secret bytea);
-		`) satisfies Array<{ id: bigint; secret: Buffer }>,
+				SELECT id, secret
+				FROM cards.new_session(${user_id}, ${user_agent})
+				AS (id bigint, secret bytea);
+			`) satisfies Array<{ id: bigint; secret: Buffer }>,
 		);
+	}
+
+	static async delete(session_id: bigint): Promise<null> {
+		await prisma.$queryRaw`
+			DELETE FROM cards.sessions
+			WHERE id = ${session_id};
+		`;
+		return null;
 	}
 
 	static async validate(session: SessionCookie): Promise<MinimizedDatabaseSession | null> {
