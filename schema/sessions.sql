@@ -20,7 +20,10 @@ CREATE TABLE sessions (
 CREATE TRIGGER sessions_check_update
     BEFORE UPDATE ON sessions
     FOR EACH ROW
-    WHEN (OLD.id != NEW.id OR OLD.birth_time != NEW.birth_time)
+    WHEN (
+        OLD.id         != NEW.id         OR
+        OLD.birth_time != NEW.birth_time
+    )
     EXECUTE FUNCTION raise_exception('cannot change id or birth_time');
 
 CREATE TRIGGER sessions_forbid_truncate

@@ -47,7 +47,10 @@ CREATE UNIQUE INDEX users_visual_username_index ON users (get_visual_username(us
 CREATE TRIGGER users_check_update
     BEFORE UPDATE ON users
     FOR EACH ROW
-    WHEN (OLD.id != NEW.id OR OLD.creation_time != NEW.creation_time)
+    WHEN (
+        OLD.id            != NEW.id            OR
+        OLD.creation_time != NEW.creation_time
+    )
     EXECUTE FUNCTION raise_exception('cannot change id or creation_time');
 
 CREATE TRIGGER users_forbid_truncate
