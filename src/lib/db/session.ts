@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import type { SessionCookie } from "$lib/session";
 import { PrismaClient } from "@prisma/client";
-import { getOneRow } from "../util";
+import { get_one_row } from "../util";
 
 const prisma = new PrismaClient();
 
@@ -20,7 +20,7 @@ export class Session {
 	static async create(userId: bigint, userAgent: string): Promise<{ id: bigint; secret: Buffer }> {
 		// Prisma is unable to get a record ("Failed to deserialize column of type 'record'"),
 		// so convert the record to some columns.
-		return getOneRow(
+		return get_one_row(
 			(await prisma.$queryRaw`
 			SELECT id, secret
 			FROM cards.new_session(${userId}, ${userAgent})

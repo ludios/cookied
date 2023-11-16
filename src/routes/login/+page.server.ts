@@ -1,7 +1,7 @@
 import { inspect } from "util";
 import { Session } from "$lib/db/session";
 import { SessionCookie } from "$lib/session";
-import { env, throwIfGt1 } from "$lib/util";
+import { env, throw_if_gt1 } from "$lib/util";
 import { PrismaClient } from "@prisma/client";
 import type { Actions } from "./$types";
 
@@ -16,7 +16,7 @@ export const actions = {
 
 		const prisma = new PrismaClient();
 		// We have an index on LOWER(username) but not username
-		const users = throwIfGt1(
+		const users = throw_if_gt1(
 			(await prisma.$queryRaw`
 				SELECT id, username
 				FROM cards.users
