@@ -1,5 +1,6 @@
 {
 	"name": "cookied",
+	"description": "PostgreSQL-backed user/password authentication for SvelteKit applications",
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "vite dev",
@@ -12,7 +13,6 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.39.0",
 		"@sveltejs/adapter-auto": "^2.1.1",
 		"@sveltejs/kit": "^1.27.4",
 		"@types/cookie": "^0.5.4",
@@ -36,18 +36,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@envelop/core": "^5.0.0",
-		"@envelop/graphql-jit": "^8.0.1",
-		"@graphql-yoga/common": "^3.9.1",
-		"@graphql-yoga/node": "^3.9.1",
-		"@graphql-yoga/render-graphiql": "^5.0.0",
-		"@pothos/core": "^3.38.0",
-		"@pothos/plugin-prisma": "^3.61.0",
 		"@prisma/client": "^5.5.2",
 		"ayy": "^3.0.0",
-		"graphql": "^16.8.1",
-		"hash-wasm": "^4.10.0",
-		"postgres": "^3.4.3"
+		"hash-wasm": "^4.10.0"
 	},
 	"ava": {
 		"extensions": {
@@ -59,7 +50,7 @@
 	},
 	"pnpm": {
 		"overrides": {
-			"esbuild": "^0.19.2"
+			"esbuild": "^0.19.5"
 		}
 	}
 }
