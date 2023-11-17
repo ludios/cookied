@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+export DATABASE_URL=$(pg_tmp)
+psql "$DATABASE_URL" -X -f schema/extensions.sql -f schema/schema.sql
