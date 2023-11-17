@@ -19,7 +19,7 @@ export const actions = {
 		const users = throw_if_gt1(
 			(await prisma.$queryRaw`
 				SELECT id, username
-				FROM cards.users
+				FROM cookied.users
 				WHERE LOWER(username) = ${username.toLowerCase()}
 			`) satisfies Array<{ id: bigint; username: string }>,
 		);

@@ -1,7 +1,7 @@
 \set ON_ERROR_STOP on
 
-CREATE SCHEMA cards;
-SET search_path TO cards;
+CREATE SCHEMA cookied;
+SET search_path TO cookied;
 
 CREATE OR REPLACE FUNCTION raise_exception() RETURNS trigger AS $$
 DECLARE
@@ -16,4 +16,3 @@ $$ LANGUAGE plpgsql;
 
 \ir users.sql
 \ir sessions.sql
-\ir cards.sql
