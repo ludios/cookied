@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
-import type { SessionCookie } from "$lib/session";
+import type { SessionCookie } from "../session.js";
 import { PrismaClient } from "@prisma/client";
-import { get_one_row } from "../util";
+import { get_one_row } from "../util.js";
 
 const prisma = new PrismaClient();
 
