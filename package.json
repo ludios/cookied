@@ -1,53 +1,9 @@
 {
-	"name": "cookied",
-	"description": "PostgreSQL-backed user/password authentication for SvelteKit applications",
+	"name": "cookied-monorepo",
 	"version": "0.0.1",
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
-		"test": "./dev/test-schema && ./node_modules/.bin/ava && ./node_modules/.bin/tsc --target esnext --moduleResolution node --noEmit tests/*.ts && ./node_modules/.bin/eslint .",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --plugin-search-dir . --write ."
-	},
-	"devDependencies": {
-		"@sveltejs/adapter-auto": "^2.1.1",
-		"@sveltejs/kit": "^1.27.4",
-		"@types/cookie": "^0.5.4",
-		"@types/node": "^20.9.0",
-		"@typescript-eslint/eslint-plugin": "^6.10.0",
-		"@typescript-eslint/parser": "^6.10.0",
-		"ava": "^5.3.1",
-		"eslint": "^8.53.0",
-		"eslint-config-prettier": "^9.0.0",
-		"eslint-plugin-svelte": "^2.35.0",
-		"prettier": "^3.0.3",
-		"prettier-plugin-svelte": "^3.1.0",
-		"prisma": "^5.5.2",
-		"svelte": "^4.2.3",
-		"svelte-check": "^3.6.0",
-		"svelte-preprocess": "^5.1.0",
-		"tslib": "^2.6.2",
-		"tsx": "^4.1.0",
-		"typescript": "^5.2.2",
-		"vite": "^4.5.0"
-	},
+	"description": "monorepo for cookied and a demo site in SvelteKit",
+	"private": true,
 	"type": "module",
-	"dependencies": {
-		"@prisma/client": "^5.5.2",
-		"ayy": "^3.0.0",
-		"hash-wasm": "^4.10.0"
-	},
-	"ava": {
-		"extensions": {
-			"ts": "commonjs"
-		},
-		"nodeArguments": [
-			"--import=tsx"
-		]
-	},
 	"pnpm": {
 		"overrides": {
 			"esbuild": "^0.19.5"

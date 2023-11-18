@@ -7,78 +7,131 @@ settings:
 overrides:
   esbuild: ^0.19.5
 
-dependencies:
-  '@prisma/client':
-    specifier: ^5.5.2
-    version: 5.6.0(prisma@5.6.0)
-  ayy:
-    specifier: ^3.0.0
-    version: 3.0.0
-  hash-wasm:
-    specifier: ^4.10.0
-    version: 4.11.0
+importers:
 
-devDependencies:
-  '@sveltejs/adapter-auto':
-    specifier: ^2.1.1
-    version: 2.1.1(@sveltejs/kit@1.27.6)
-  '@sveltejs/kit':
-    specifier: ^1.27.4
-    version: 1.27.6(svelte@4.2.4)(vite@4.5.0)
-  '@types/cookie':
-    specifier: ^0.5.4
-    version: 0.5.4
-  '@types/node':
-    specifier: ^20.9.0
-    version: 20.9.1
-  '@typescript-eslint/eslint-plugin':
-    specifier: ^6.10.0
-    version: 6.11.0(@typescript-eslint/parser@6.11.0)(eslint@8.53.0)(typescript@5.2.2)
-  '@typescript-eslint/parser':
-    specifier: ^6.10.0
-    version: 6.11.0(eslint@8.53.0)(typescript@5.2.2)
-  ava:
-    specifier: ^5.3.1
-    version: 5.3.1
-  eslint:
-    specifier: ^8.53.0
-    version: 8.53.0
-  eslint-config-prettier:
-    specifier: ^9.0.0
-    version: 9.0.0(eslint@8.53.0)
-  eslint-plugin-svelte:
-    specifier: ^2.35.0
-    version: 2.35.0(eslint@8.53.0)(svelte@4.2.4)
-  prettier:
-    specifier: ^3.0.3
-    version: 3.1.0
-  prettier-plugin-svelte:
-    specifier: ^3.1.0
-    version: 3.1.0(prettier@3.1.0)(svelte@4.2.4)
-  prisma:
-    specifier: ^5.5.2
-    version: 5.6.0
-  svelte:
-    specifier: ^4.2.3
-    version: 4.2.4
-  svelte-check:
-    specifier: ^3.6.0
-    version: 3.6.0(postcss@8.4.31)(svelte@4.2.4)
-  svelte-preprocess:
-    specifier: ^5.1.0
-    version: 5.1.0(postcss@8.4.31)(svelte@4.2.4)(typescript@5.2.2)
-  tslib:
-    specifier: ^2.6.2
-    version: 2.6.2
-  tsx:
-    specifier: ^4.1.0
-    version: 4.1.2
-  typescript:
-    specifier: ^5.2.2
-    version: 5.2.2
-  vite:
-    specifier: ^4.5.0
-    version: 4.5.0(@types/node@20.9.1)
+  .: {}
+
+  packages/cookied:
+    dependencies:
+      '@prisma/client':
+        specifier: ^5.5.2
+        version: 5.6.0(prisma@5.6.0)
+      ayy:
+        specifier: ^3.0.0
+        version: 3.0.0
+      hash-wasm:
+        specifier: ^4.10.0
+        version: 4.11.0
+    devDependencies:
+      '@types/cookie':
+        specifier: ^0.5.4
+        version: 0.5.4
+      '@types/node':
+        specifier: ^20.9.0
+        version: 20.9.1
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^6.10.0
+        version: 6.11.0(@typescript-eslint/parser@6.11.0)(eslint@8.53.0)(typescript@5.2.2)
+      '@typescript-eslint/parser':
+        specifier: ^6.10.0
+        version: 6.11.0(eslint@8.53.0)(typescript@5.2.2)
+      ava:
+        specifier: ^5.3.1
+        version: 5.3.1
+      eslint:
+        specifier: ^8.53.0
+        version: 8.53.0
+      eslint-config-prettier:
+        specifier: ^9.0.0
+        version: 9.0.0(eslint@8.53.0)
+      prettier:
+        specifier: ^3.0.3
+        version: 3.1.0
+      prisma:
+        specifier: ^5.5.2
+        version: 5.6.0
+      tslib:
+        specifier: ^2.6.2
+        version: 2.6.2
+      tsx:
+        specifier: ^4.1.0
+        version: 4.1.2
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+
+  sites/demo:
+    dependencies:
+      '@prisma/client':
+        specifier: ^5.5.2
+        version: 5.6.0(prisma@5.6.0)
+      ayy:
+        specifier: ^3.0.0
+        version: 3.0.0
+      hash-wasm:
+        specifier: ^4.10.0
+        version: 4.11.0
+    devDependencies:
+      '@sveltejs/adapter-auto':
+        specifier: ^2.1.1
+        version: 2.1.1(@sveltejs/kit@1.27.6)
+      '@sveltejs/kit':
+        specifier: ^1.27.4
+        version: 1.27.6(svelte@4.2.4)(vite@4.5.0)
+      '@types/cookie':
+        specifier: ^0.5.4
+        version: 0.5.4
+      '@types/node':
+        specifier: ^20.9.0
+        version: 20.9.1
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^6.10.0
+        version: 6.11.0(@typescript-eslint/parser@6.11.0)(eslint@8.53.0)(typescript@5.2.2)
+      '@typescript-eslint/parser':
+        specifier: ^6.10.0
+        version: 6.11.0(eslint@8.53.0)(typescript@5.2.2)
+      ava:
+        specifier: ^5.3.1
+        version: 5.3.1
+      eslint:
+        specifier: ^8.53.0
+        version: 8.53.0
+      eslint-config-prettier:
+        specifier: ^9.0.0
+        version: 9.0.0(eslint@8.53.0)
+      eslint-plugin-svelte:
+        specifier: ^2.35.0
+        version: 2.35.0(eslint@8.53.0)(svelte@4.2.4)
+      prettier:
+        specifier: ^3.0.3
+        version: 3.1.0
+      prettier-plugin-svelte:
+        specifier: ^3.1.0
+        version: 3.1.0(prettier@3.1.0)(svelte@4.2.4)
+      prisma:
+        specifier: ^5.5.2
+        version: 5.6.0
+      svelte:
+        specifier: ^4.2.3
+        version: 4.2.4
+      svelte-check:
+        specifier: ^3.6.0
+        version: 3.6.0(postcss@8.4.31)(svelte@4.2.4)
+      svelte-preprocess:
+        specifier: ^5.1.0
+        version: 5.1.0(postcss@8.4.31)(svelte@4.2.4)(typescript@5.2.2)
+      tslib:
+        specifier: ^2.6.2
+        version: 2.6.2
+      tsx:
+        specifier: ^4.1.0
+        version: 4.1.2
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+      vite:
+        specifier: ^4.5.0
+        version: 4.5.0(@types/node@20.9.1)
 
 packages:
 
