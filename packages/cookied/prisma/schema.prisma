@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model sessions {
+  id                    BigInt   @id @default(autoincrement())
+  user_id               BigInt
+  birth_time            DateTime @default(now()) @db.Timestamptz(6)
+  hashed_secret         Bytes
+  user_agent_seen_first String
+  users                 users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model users {
+  id            BigInt     @id @default(autoincrement())
+  username      String
+  creation_time DateTime   @db.Timestamptz(6)
+  sessions      sessions[]
+}

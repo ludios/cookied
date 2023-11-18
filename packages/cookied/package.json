@@ -3,32 +3,22 @@
 	"description": "PostgreSQL-backed authentication for Node.js-based web applications",
 	"version": "0.0.1",
 	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
 		"test": "./dev/test-schema && ./node_modules/.bin/ava && ./node_modules/.bin/tsc --target esnext --moduleResolution node --noEmit tests/*.ts && ./node_modules/.bin/eslint .",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write ."
-	},
-	"devDependencies": {
-		"@types/cookie": "^0.5.4",
-		"@types/node": "^20.9.0",
-		"@typescript-eslint/eslint-plugin": "^6.10.0",
-		"@typescript-eslint/parser": "^6.10.0",
-		"ava": "^5.3.1",
-		"eslint": "^8.53.0",
-		"eslint-config-prettier": "^9.0.0",
-		"prettier": "^3.0.3",
-		"prisma": "^5.5.2",
-		"tslib": "^2.6.2",
-		"tsx": "^4.1.0",
-		"typescript": "^5.2.2"
 	},
 	"type": "module",
 	"dependencies": {
 		"@prisma/client": "^5.5.2",
 		"ayy": "^3.0.0",
 		"hash-wasm": "^4.10.0"
+	},
+	"devDependencies": {
+		"prisma": "^5.5.2",
+		"ava": "^5.3.1",
+		"tsx": "^4.1.0",
+		"typescript": "^5.2.2",
+		"eslint": "^8.53.0"
 	},
 	"ava": {
 		"extensions": {

@@ -4,6 +4,12 @@
 	"description": "monorepo for cookied and a demo site in SvelteKit",
 	"private": true,
 	"type": "module",
+	"devDependencies": {
+		"@types/cookie": "^0.5.4",
+		"@types/node": "^20.9.0",
+		"@typescript-eslint/eslint-plugin": "^6.10.0",
+		"@typescript-eslint/parser": "^6.10.0"
+	},
 	"pnpm": {
 		"overrides": {
 			"esbuild": "^0.19.5"
