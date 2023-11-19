@@ -64,6 +64,9 @@ importers:
       ayy:
         specifier: ^3.0.0
         version: 3.0.0
+      cookied:
+        specifier: workspace:^
+        version: link:../../packages/cookied
       hash-wasm:
         specifier: ^4.10.0
         version: 4.11.0

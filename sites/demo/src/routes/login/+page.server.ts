@@ -1,7 +1,7 @@
 import { inspect } from "util";
-import { Session } from "$lib/db/session";
-import { SessionCookie } from "$lib/session";
-import { env, throw_if_gt1 } from "$lib/util";
+import { Session } from "cookied/lib/db/session";
+import { SessionCookie } from "cookied/lib/session";
+import { env, throw_if_gt1 } from "cookied/lib/util";
 import { PrismaClient } from "@prisma/client";
 import type { Actions } from "./$types";
 

@@ -1,6 +1,6 @@
 import test from "ava";
 import { AssertionError } from "ayy";
-import { BadSessionCookieError, SessionCookie } from "../src/lib/session.js";
+import { BadSessionCookieError, SessionCookie } from "../lib/session.js";
 
 test("new SessionCookie", (t) => {
 	new SessionCookie(1n, Buffer.alloc(16));

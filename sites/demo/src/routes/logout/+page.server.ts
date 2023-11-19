@@ -1,5 +1,5 @@
-import { Session } from "$lib/db/session";
-import { env } from "$lib/util";
+import { Session } from "cookied/lib/db/session";
+import { env } from "cookied/lib/util";
 import type { Actions } from "./$types";
 
 const SESSION_COOKIE_NAME: string = env("SESSION_COOKIE_NAME");
