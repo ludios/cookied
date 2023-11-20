@@ -35,7 +35,7 @@ type GotSessionCallback = (
 export function make_hook(cookie_options: CookieOptions, got_session: GotSessionCallback): Handle {
     return async ({ event, resolve }) => {
         const cookies = event.cookies;
-        console.log("cookies", cookies.getAll());
+        console.debug("cookies from client", cookies.getAll());
         const s_cookie = cookies.get(cookie_options.name);
         if (!s_cookie) {
             return resolve(event);
