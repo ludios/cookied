@@ -7,7 +7,13 @@ schema=$here/../../../packages/cookied/schema
 
 export DATABASE_URL=$(pg_tmp)
 
-psql "$DATABASE_URL" -X -f "$schema"/extensions.sql -f "$schema"/schema.sql
+psql -X "$DATABASE_URL" \
+	-f "$schema"/extensions.sql \
+	-f "$schema"/schema.sql
 # TODO: insert some sample data
+
+export SESSION_COOKIE_NAME=s
+export SESSION_COOKIE_PATH=/
+export SESSION_COOKIE_SECURE=0
 
 ./node_modules/.bin/vite dev --host
