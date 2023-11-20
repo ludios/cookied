@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+here=$(dirname -- "$0")
+schema=$here/../../../packages/cookied/schema
+
+export DATABASE_URL=$(pg_tmp)
+
+psql "$DATABASE_URL" -X -f "$schema"/extensions.sql -f "$schema"/schema.sql
+# TODO: insert some sample data
+
+./node_modules/.bin/vite dev --host

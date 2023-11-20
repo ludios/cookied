@@ -3,7 +3,7 @@
 	"description": "Demo site for showing that cookied actually works",
 	"version": "0.0.1",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "./dev/serve",
 		"build": "vite build",
 		"preview": "vite preview",
 		"test": "./dev/test-schema && ./node_modules/.bin/ava && ./node_modules/.bin/tsc --target esnext --moduleResolution node --noEmit tests/*.ts && ./node_modules/.bin/eslint .",
