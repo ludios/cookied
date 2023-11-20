@@ -3,7 +3,7 @@
 set -eu -o pipefail
 
 here=$(dirname -- "$0")
-schema=$here/../../../packages/cookied/schema
+schema=$here/../../../schema
 
 export DATABASE_URL=$("$here"/prisma-compatible-postgres-uri "$(pg_tmp)")
 

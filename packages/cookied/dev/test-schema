@@ -5,4 +5,7 @@ set -eu -o pipefail
 here=$(dirname -- "$0")
 
 export DATABASE_URL=$(pg_tmp)
-psql "$DATABASE_URL" -X -f "$here"/../schema/extensions.sql -f "$here"/../schema/schema.sql
+schema="$here"/../../../schema
+psql -X "$DATABASE_URL" \
+	-f "$schema"/extensions.sql \
+	-f "$schema"/schema.sql
