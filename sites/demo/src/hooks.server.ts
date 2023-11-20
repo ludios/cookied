@@ -8,13 +8,6 @@ const SESSION_COOKIE_NAME: string = env("SESSION_COOKIE_NAME");
 const SESSION_COOKIE_PATH: string = env("SESSION_COOKIE_PATH");
 const SESSION_COOKIE_SECURE: boolean = Boolean(Number(env("SESSION_COOKIE_SECURE")));
 
-function clear_session_cookie(cookies: Cookies) {
-	cookies.delete(SESSION_COOKIE_NAME, {
-		path: SESSION_COOKIE_PATH,
-		secure: SESSION_COOKIE_SECURE,
-	});
-}
-
 const cookie_options = {
 	name: SESSION_COOKIE_NAME,
 	path: SESSION_COOKIE_PATH,
