@@ -5,7 +5,7 @@ set -eu -o pipefail
 here=$(dirname -- "$0")
 schema=$here/../../../schema
 
-export DATABASE_URL=$("$here"/prisma-compatible-postgres-uri "$(pg_tmp)")
+DATABASE_URL=$(pg_tmp)
 echo "ephemeralpg running at $DATABASE_URL"
 echo
 
@@ -17,6 +17,9 @@ psql -X "$DATABASE_URL" \
 echo
 echo "Log in with: demo/pass"
 echo
+
+# https://www.prisma.io/docs/concepts/database-connectors/postgresql#arguments
+export DATABASE_URL="$("$here"/prisma-compatible-postgres-uri "$DATABASE_URL")&schema=cookied"
 
 export SESSION_COOKIE_NAME=s
 export SESSION_COOKIE_PATH=/

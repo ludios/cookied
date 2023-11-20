@@ -35,7 +35,7 @@ ALTER TABLE sessions CLUSTER ON sessions_pkey;
 
 CREATE FUNCTION new_session(user_id_ bigint, user_agent_seen_first_ text) RETURNS RECORD AS $$
 DECLARE
-    secret_ bytea := gen_random_bytes(16);
+    secret_ bytea := public.gen_random_bytes(16);
     hashed_secret_ bytea = substring(sha384(secret_) from 1 for 16);
     id_ bigint;
     ret RECORD;
