@@ -5,7 +5,7 @@ import { get_one_row } from "../util.js";
 
 const prisma = new PrismaClient();
 
-type MinimizedDatabaseSession = {
+export type MinimizedDatabaseSession = {
 	id: number;
 	user_id: number;
 	birth_time: Date;

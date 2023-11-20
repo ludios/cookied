@@ -13,6 +13,9 @@
 		"ayy": "^3.0.0",
 		"hash-wasm": "^4.10.0"
 	},
+	"peerDependencies": {
+		"@sveltejs/kit": "^1.27.6"
+	},
 	"devDependencies": {
 		"prisma": "^5.5.2",
 		"ava": "^5.3.1",
