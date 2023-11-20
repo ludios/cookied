@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# If you give `prisma db pull` a DATABASE_URL like
+# "postgresql:///test?host=%2Ftmp%2Fephemeralpg.jymMG4", it will fail:
+#
+# ✖ Introspecting based on datasource defined in prisma/schema.prisma
+# Error: P1001
+# Can't reach database server at `/tmp/ephemeralpg.jymMG4`:`5432`
+# Please make sure your database server is running at `/tmp/ephemeralpg.jymMG4`:`5432`.
+#
+# As per https://github.com/prisma/prisma/issues/11171, we need to convert the
+# postgresql:// URI to one that actually works with Prisma:
+# "postgresql:///test?host=%2Ftmp%2Fephemeralpg.jymMG4" ->
+# "postgresql://$USER@localhost/test?host=%2Ftmp%2Fephemeralpg.jymMG4"
+
+echo -n "$1" | sed -r "s,^postgres(ql)?:///,postgresql://$USER@localhost/,"
