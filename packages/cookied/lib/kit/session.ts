@@ -12,11 +12,21 @@ export type CookieOptions = {
     secure: boolean,
 }
 
-function clear_session_cookie(cookie_options: CookieOptions, cookies: Cookies) {
+// On the `cookies` object for the response, clear our session cookie as per `cookie_options`.
+export function clear_session_cookie(cookie_options: CookieOptions, cookies: Cookies) {
 	cookies.delete(cookie_options.name, {
 		path: cookie_options.path,
 		secure: cookie_options.secure,
 	});
+}
+
+// On the `cookies` object for the response, set our session cookie `s_cookie` as per `cookie_options`.
+export function set_session_cookie(cookie_options: CookieOptions, cookies: Cookies, s_cookie: SessionCookie) {
+    cookies.set(cookie_options.name, s_cookie.toString(), {
+        path: cookie_options.path,
+        secure: cookie_options.secure,
+        priority: "high",
+    });
 }
 
 type GotSessionCallback = (

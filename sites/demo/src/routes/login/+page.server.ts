@@ -4,10 +4,13 @@ import { SessionCookie } from "cookied/lib/session";
 import { env, throw_if_gt1 } from "cookied/lib/util";
 import { PrismaClient } from "@prisma/client";
 import type { Actions } from "./$types";
+import { set_session_cookie, type CookieOptions } from "cookied/lib/kit/session";
 
-const SESSION_COOKIE_NAME: string = env("SESSION_COOKIE_NAME");
-const SESSION_COOKIE_PATH: string = env("SESSION_COOKIE_PATH");
-const SESSION_COOKIE_SECURE: boolean = Boolean(Number(env("SESSION_COOKIE_SECURE")));
+const cookie_options: CookieOptions = {
+	name: env("SESSION_COOKIE_NAME"),
+	path: env("SESSION_COOKIE_PATH"),
+	secure: Boolean(Number(env("SESSION_COOKIE_SECURE"))),
+};
 
 export const actions = {
 	default: async ({ cookies, request }) => {
@@ -36,10 +39,6 @@ export const actions = {
 
 		// Set a session cookie in the HTTP response
 		const s_cookie = new SessionCookie(id, secret);
-		cookies.set(SESSION_COOKIE_NAME, s_cookie.toString(), {
-			path: SESSION_COOKIE_PATH,
-			secure: SESSION_COOKIE_SECURE,
-			priority: "high",
-		});
+		set_session_cookie(cookie_options, cookies, s_cookie);
 	},
 } satisfies Actions;
