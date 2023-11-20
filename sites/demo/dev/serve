@@ -10,7 +10,8 @@ export DATABASE_URL=$("$here"/prisma-compatible-postgres-uri "$(pg_tmp)")
 psql -X "$DATABASE_URL" \
 	-f "$schema"/extensions.sql \
 	-f "$schema"/schema.sql
-# TODO: insert some sample data
+psql -X "$DATABASE_URL" \
+	-c "INSERT INTO cookied.users (username) VALUES ('demo')"
 
 export SESSION_COOKIE_NAME=s
 export SESSION_COOKIE_PATH=/
