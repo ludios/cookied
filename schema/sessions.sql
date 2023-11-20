@@ -40,7 +40,7 @@ DECLARE
     id_ bigint;
     ret RECORD;
 BEGIN
-    INSERT INTO sessions (hashed_secret, user_id, user_agent_seen_first) VALUES (hashed_secret_, user_id_, user_agent_seen_first_) RETURNING id INTO id_;
+    INSERT INTO cookied.sessions (hashed_secret, user_id, user_agent_seen_first) VALUES (hashed_secret_, user_id_, user_agent_seen_first_) RETURNING id INTO id_;
     SELECT id_, secret_ INTO ret;
     RETURN ret;
 END;
