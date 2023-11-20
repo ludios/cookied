@@ -1,17 +1,11 @@
-import { Session } from "cookied/lib/db/session";
-import { BadSessionCookieError, SessionCookie } from "cookied/lib/session";
 import { env } from "cookied/lib/util";
-import { make_hook } from "cookied/lib/kit/session";
-import type { Handle, Cookies } from '@sveltejs/kit';
+import { make_hook, type CookieOptions } from "cookied/lib/kit/session";
+import type { Handle } from '@sveltejs/kit';
 
-const SESSION_COOKIE_NAME: string = env("SESSION_COOKIE_NAME");
-const SESSION_COOKIE_PATH: string = env("SESSION_COOKIE_PATH");
-const SESSION_COOKIE_SECURE: boolean = Boolean(Number(env("SESSION_COOKIE_SECURE")));
-
-const cookie_options = {
-	name: SESSION_COOKIE_NAME,
-	path: SESSION_COOKIE_PATH,
-	secure: SESSION_COOKIE_SECURE,
+const cookie_options: CookieOptions = {
+	name: env("SESSION_COOKIE_NAME"),
+	path: env("SESSION_COOKIE_PATH"),
+	secure: Boolean(Number(env("SESSION_COOKIE_SECURE"))),
 };
 
 export const handle: Handle = make_hook(cookie_options, ({ session, event }) => {

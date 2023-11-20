@@ -3,7 +3,7 @@ import { BadSessionCookieError, SessionCookie } from "../session.js";
 import type { MinimizedDatabaseSession } from "../db/session.js";
 import type { Handle, Cookies, RequestEvent } from "@sveltejs/kit";
 
-type CookieOptions = {
+export type CookieOptions = {
     // Name for the session cookie, e.g. "s" or some other name unique for the domain
     name: string,
     // The path under which the cookie is valid. Should usually be "/".
