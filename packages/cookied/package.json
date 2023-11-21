@@ -9,19 +9,19 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@prisma/client": "^5.5.2",
+		"@prisma/client": "^5.6.0",
 		"ayy": "^3.0.0",
-		"hash-wasm": "^4.10.0"
+		"hash-wasm": "^4.11.0"
 	},
 	"peerDependencies": {
 		"@sveltejs/kit": "^1.27.6"
 	},
 	"devDependencies": {
-		"prisma": "^5.5.2",
 		"ava": "^5.3.1",
-		"tsx": "^4.1.0",
-		"typescript": "^5.2.2",
-		"eslint": "^8.53.0"
+		"eslint": "^8.54.0",
+		"prisma": "^5.6.0",
+		"tsx": "^4.1.4",
+		"typescript": "^5.3.2"
 	},
 	"ava": {
 		"extensions": {
