@@ -6,6 +6,7 @@ import { PrismaClient } from "@prisma/client";
 import type { Actions } from "./$types";
 import { set_session_cookie, type CookieOptions } from "cookied/lib/kit/session";
 import { argon2Verify } from "hash-wasm";
+import { A } from "ayy";
 
 const cookie_options: CookieOptions = {
 	name: env("SESSION_COOKIE_NAME"),
@@ -43,6 +44,8 @@ export const actions = {
 			console.log("incorrect password", { username });
 			return;
 		}
+		// Sanity check because this is pretty important
+		A(password_is_correct);
 
 		// Create a new session in the database
 		const { id, secret } = await Session.create(user.id, request.headers.get("User-Agent") || "");
