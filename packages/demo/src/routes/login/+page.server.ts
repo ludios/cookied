@@ -5,6 +5,7 @@ import { env, throw_if_gt1 } from "cookied/lib/util";
 import { PrismaClient } from "@prisma/client";
 import type { Actions } from "./$types";
 import { set_session_cookie, type CookieOptions } from "cookied/lib/kit/session";
+import { argon2Verify } from "hash-wasm";
 
 const cookie_options: CookieOptions = {
 	name: env("SESSION_COOKIE_NAME"),
@@ -24,7 +25,7 @@ export const actions = {
 				SELECT id, username, hashed_password
 				FROM cookied.users
 				WHERE LOWER(username) = ${username.toLowerCase()}
-			`) satisfies Array<{ id: bigint; username: string }>,
+			`) satisfies Array<{ id: bigint; username: string, hashed_password: string }>,
 		);
 		// Sanity-check the row from the database: ensure username match
 		if (!(users.length && users[0].username.toLowerCase() === username.toLowerCase())) {
@@ -33,6 +34,15 @@ export const actions = {
 		}
 		const user = users[0];
 		console.log(`Found user! ${inspect(user)}`);
+
+		const password_is_correct = await argon2Verify({
+			password: form_data.get("password") as string,
+			hash: user.hashed_password,
+		});
+		if (!password_is_correct) {
+			console.log("incorrect password", { username });
+			return;
+		}
 
 		// Create a new session in the database
 		const { id, secret } = await Session.create(user.id, request.headers.get("User-Agent") || "");

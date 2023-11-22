@@ -4,21 +4,24 @@ set -eu -o pipefail
 
 here=$(dirname -- "$0")
 schema=$here/../../../schema
+cookied=$here/../../cookied
 
 DATABASE_URL=$(pg_tmp)
 echo "ephemeralpg running at $DATABASE_URL"
 echo
 
+hashed_password=$(echo -n "pass" | "$cookied"/dev/hash-password.mjs)
+
 psql -X "$DATABASE_URL" \
 	-f "$schema"/extensions.sql \
 	-f "$schema"/schema.sql
 psql -X "$DATABASE_URL" \
-	-c "INSERT INTO cookied.users (username, hashed_password) VALUES ('demo', '')"
+	-c "INSERT INTO cookied.users (username, hashed_password) VALUES ('demo', '$hashed_password')"
 echo
 echo "Log in with: demo/pass"
 
 # https://www.prisma.io/docs/concepts/database-connectors/postgresql#arguments
-export DATABASE_URL="$("$here"/../../cookied/dev/prisma-compatible-postgres-uri "$DATABASE_URL")&schema=cookied"
+export DATABASE_URL="$("$cookied"/dev/prisma-compatible-postgres-uri "$DATABASE_URL")&schema=cookied"
 
 export SESSION_COOKIE_NAME=s
 export SESSION_COOKIE_PATH=/
