@@ -34,6 +34,7 @@ CREATE TABLE users (
     id               bigint       GENERATED ALWAYS AS IDENTITY PRIMARY KEY CHECK (id >= 1 AND id < 1000000000000),
     -- The username with its preferred casing
     username         username     NOT NULL,
+    hashed_password  text         NOT NULL,
     creation_time    timestamptz  NOT NULL DEFAULT now()
 );
 

@@ -21,7 +21,7 @@ export const actions = {
 		// We have an index on LOWER(username) but not username
 		const users = throw_if_gt1(
 			(await prisma.$queryRaw`
-				SELECT id, username
+				SELECT id, username, hashed_password
 				FROM cookied.users
 				WHERE LOWER(username) = ${username.toLowerCase()}
 			`) satisfies Array<{ id: bigint; username: string }>,

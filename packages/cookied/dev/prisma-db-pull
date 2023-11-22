@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+here=$(dirname -- "$0")
+schema=$here/../../../schema
+
+DATABASE_URL=$(pg_tmp)
+echo "ephemeralpg running at $DATABASE_URL"
+echo
+
+psql -X "$DATABASE_URL" \
+	-f "$schema"/extensions.sql \
+	-f "$schema"/schema.sql
+
+# https://www.prisma.io/docs/concepts/database-connectors/postgresql#arguments
+export DATABASE_URL="$("$here"/prisma-compatible-postgres-uri "$DATABASE_URL")&schema=cookied"
+
+$here/../node_modules/.bin/prisma db pull --force

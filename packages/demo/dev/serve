@@ -13,13 +13,12 @@ psql -X "$DATABASE_URL" \
 	-f "$schema"/extensions.sql \
 	-f "$schema"/schema.sql
 psql -X "$DATABASE_URL" \
-	-c "INSERT INTO cookied.users (username) VALUES ('demo')"
+	-c "INSERT INTO cookied.users (username, hashed_password) VALUES ('demo', '')"
 echo
 echo "Log in with: demo/pass"
-echo
 
 # https://www.prisma.io/docs/concepts/database-connectors/postgresql#arguments
-export DATABASE_URL="$("$here"/prisma-compatible-postgres-uri "$DATABASE_URL")&schema=cookied"
+export DATABASE_URL="$("$here"/../../cookied/dev/prisma-compatible-postgres-uri "$DATABASE_URL")&schema=cookied"
 
 export SESSION_COOKIE_NAME=s
 export SESSION_COOKIE_PATH=/

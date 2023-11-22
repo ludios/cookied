@@ -20,8 +20,9 @@ model sessions {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model users {
-  id            BigInt     @id @default(autoincrement())
-  username      String
-  creation_time DateTime   @db.Timestamptz(6)
-  sessions      sessions[]
+  id              BigInt     @id @default(autoincrement())
+  username        String
+  hashed_password String
+  creation_time   DateTime   @default(now()) @db.Timestamptz(6)
+  sessions        sessions[]
 }
