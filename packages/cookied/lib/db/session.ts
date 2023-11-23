@@ -30,7 +30,7 @@ export class Session {
 		);
 	}
 
-	static async delete(session_id: bigint): Promise<null> {
+	static async delete(session_id: number): Promise<null> {
 		await prisma.$queryRaw`
 			DELETE FROM cookied.sessions
 			WHERE id = ${session_id};

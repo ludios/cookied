@@ -1,6 +1,6 @@
 import { env } from "cookied/lib/util";
 import type { CookieOptions } from "cookied/lib/kit/session";
-import { make_login_action } from "cookied/lib/kit/login";
+import { make_login_action } from "cookied/lib/kit/user";
 import type { Actions } from "@sveltejs/kit";
 
 const cookie_options: CookieOptions = {

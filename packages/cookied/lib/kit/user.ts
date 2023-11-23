@@ -1,9 +1,9 @@
 import { Prisma } from '@prisma/client';
-import { Session } from "../db/session.js";
+import { MinimizedDatabaseSession, Session } from "../db/session.js";
 import { SessionCookie } from "../session.js";
 import { throw_if_gt1 } from "../util.js";
 import { PrismaClient } from "@prisma/client";
-import { set_session_cookie, type CookieOptions } from "./session.js";
+import { set_session_cookie, clear_session_cookie, type CookieOptions } from "./session.js";
 import { argon2Verify } from "hash-wasm";
 import { A } from "ayy";
 import { Cookies } from "@sveltejs/kit";
@@ -49,5 +49,20 @@ export function make_login_action(cookie_options: CookieOptions, pg_schema: stri
 		const s_cookie = new SessionCookie(id, secret);
 		set_session_cookie(cookie_options, cookies, s_cookie);
 		return {"success": true}
+	}
+}
+
+export function make_logout_action(cookie_options: CookieOptions) {
+	return async ({ cookies, locals }: { cookies: Cookies, locals: unknown }) => {
+		const { session } = locals as { session: MinimizedDatabaseSession };
+
+		if (session?.id) {
+			// Remove the session from the database
+			Session.delete(session.id);
+		} else {
+			console.log("no session to log out");
+		}
+
+		clear_session_cookie(cookie_options, cookies);
 	}
 }
