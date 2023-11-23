@@ -16,4 +16,8 @@ psql -X "$DATABASE_URL" \
 # https://www.prisma.io/docs/concepts/database-connectors/postgresql#arguments
 export DATABASE_URL="$("$here"/prisma-compatible-postgres-uri "$DATABASE_URL")&schema=cookied"
 
-$here/../node_modules/.bin/prisma db pull --force
+# --force does not correctly preserve sessions_view.
+# https://www.prisma.io/docs/concepts/components/prisma-schema/views#adding-a-unique-identifier-to-an-introspected-view
+#$here/../node_modules/.bin/prisma db pull --force
+
+$here/../node_modules/.bin/prisma db pull

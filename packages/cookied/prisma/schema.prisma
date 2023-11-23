@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -25,4 +26,13 @@ model users {
   hashed_password String
   creation_time   DateTime   @default(now()) @db.Timestamptz(6)
   sessions        sessions[]
+}
+
+view sessions_view {
+  id                    BigInt   @unique
+  user_id               BigInt
+  birth_time            DateTime @db.Timestamptz(6)
+  hashed_secret         Bytes
+  user_agent_seen_first String
+  username              String
 }

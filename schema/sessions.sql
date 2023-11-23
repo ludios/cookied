@@ -46,7 +46,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- How will sessions be validated if we have e.g. caching of sessions in web servers?
---
--- Retrieve entire row from PostgreSQL
--- Every time user sends secret, sha384 it and verify against cache or PostgreSQL
+
+
+CREATE VIEW sessions_view AS
+    SELECT
+        sessions.*,
+        users.username
+    FROM cookied.sessions
+    LEFT JOIN cookied.users ON users.id = sessions.user_id;

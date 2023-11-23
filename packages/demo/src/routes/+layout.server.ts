@@ -5,5 +5,7 @@ import type { LayoutServerLoad } from "./$types";
 // As per https://joyofcode.xyz/sveltekit-hooks
 export const load = (async ({ locals }) => {
 	console.log("locals", locals);
-	return { session: locals.session };
+	return {
+		session: locals.session
+	};
 }) satisfies LayoutServerLoad;

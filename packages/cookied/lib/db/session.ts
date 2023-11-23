@@ -10,11 +10,12 @@ export type MinimizedDatabaseSession = {
 	user_id: number;
 	birth_time: Date;
 	user_agent_seen_first: string;
+	username: string;
 };
 
 export class Session {
 	static async byId(session_id: bigint) {
-		return prisma.sessions.findUnique({ where: { id: session_id } });
+		return prisma.sessions_view.findUnique({ where: { id: session_id } });
 	}
 
 	static async create(user_id: bigint, user_agent: string): Promise<{ id: bigint; secret: Buffer }> {
@@ -50,6 +51,7 @@ export class Session {
 			user_id: Number(db_session.user_id),
 			birth_time: db_session.birth_time,
 			user_agent_seen_first: db_session.user_agent_seen_first,
+			username: db_session.username,
 		};
 	}
 }
