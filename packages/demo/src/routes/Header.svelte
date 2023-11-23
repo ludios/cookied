@@ -19,11 +19,24 @@
 	form {
 		display: inline;
 	}
+
+	details {
+		display: inline;
+	}
+
+	details[open] {
+		width: 100%;
+		overflow-x: scroll;
+	}
 </style>
 
 <header>
 	<nav>
 		{#if data.session}
+			<details>
+				<summary></summary>
+				<pre>{JSON.stringify(data.session, null, 2)}</pre>
+			</details>
 			Logged in as <b>{data.session.username}</b> (session id: {data.session.id})
 			<form method="POST" action="/logout">
 				<button>Log out</button>
