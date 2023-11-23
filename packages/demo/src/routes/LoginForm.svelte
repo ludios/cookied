@@ -4,7 +4,7 @@
 			<span>Username</span><br>
 			<input id="username" name="username" type="text" autocomplete="username">
 		</label>
-        <br>
+		<br>
 
 		<label>
 			<span>Password</span><br>
