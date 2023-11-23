@@ -10,12 +10,12 @@ export const actions = {
 	default: async ({ cookies, locals }) => {
 		const { session } = locals;
 
-		if (!session) {
+		if (session?.id) {
+			// Remove the session from the database
+			Session.delete(session.id);
+		} else {
 			console.log("no session to log out");
 		}
-
-		// Remove the session from the database
-		Session.delete(session.id);
 
 		// Clear the cookie
 		cookies.delete(SESSION_COOKIE_NAME, {

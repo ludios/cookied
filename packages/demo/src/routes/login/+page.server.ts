@@ -31,10 +31,9 @@ export const actions = {
 		// Sanity-check the row from the database: ensure username match
 		if (!(users.length && users[0].username.toLowerCase() === username.toLowerCase())) {
 			console.log("no such user", { username });
-			return;
+			return {"error": "no such user"};
 		}
 		const user = users[0];
-		console.log(`Found user! ${inspect(user)}`);
 
 		const password_is_correct = await argon2Verify({
 			password: form_data.get("password") as string,
@@ -42,7 +41,7 @@ export const actions = {
 		});
 		if (!password_is_correct) {
 			console.log("incorrect password", { username });
-			return;
+			return {"error": "incorrect password"};
 		}
 		// Sanity check because this is pretty important
 		A(password_is_correct);
@@ -53,5 +52,6 @@ export const actions = {
 		// Set a session cookie in the HTTP response
 		const s_cookie = new SessionCookie(id, secret);
 		set_session_cookie(cookie_options, cookies, s_cookie);
+		return {"success": true}
 	},
 } satisfies Actions;
