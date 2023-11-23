@@ -15,15 +15,21 @@
 	nav > div[aria-current="page"] {
 		font-weight: bold;
 	}
+
+	form {
+		display: inline;
+	}
 </style>
 
 <header>
 	<nav>
-		Session: {JSON.stringify(data.session)}
 		{#if data.session}
+			Logged in as <b>{data.session.username}</b> (session id: {data.session.id})
 			<form method="POST" action="/logout">
 				<button>Log out</button>
 			</form>
+		{:else}
+			<a href="/">Log in</a>
 		{/if}
 
 		<hr>
