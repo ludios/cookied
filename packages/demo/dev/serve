@@ -18,7 +18,9 @@ psql -X "$DATABASE_URL" \
 psql -X "$DATABASE_URL" \
 	-c "INSERT INTO cookied.users (username, hashed_password) VALUES ('demo', '$hashed_password')"
 echo
-echo "Log in with: demo/pass"
+echo "-- Log in with --"
+echo " Username: demo"
+echo " Password: pass"
 
 # https://www.prisma.io/docs/concepts/database-connectors/postgresql#arguments
 export DATABASE_URL="$("$cookied"/dev/prisma-compatible-postgres-uri "$DATABASE_URL")&schema=cookied"
