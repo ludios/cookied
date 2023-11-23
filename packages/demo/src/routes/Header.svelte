@@ -20,9 +20,11 @@
 <header>
 	<nav>
 		Session: {JSON.stringify(data.session)}
-		<form method="POST" action="/logout">
-			<button>Log out</button>
-		</form>
+		{#if data.session}
+			<form method="POST" action="/logout">
+				<button>Log out</button>
+			</form>
+		{/if}
 
 		<hr>
 
