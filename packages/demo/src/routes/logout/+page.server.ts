@@ -1,6 +1,5 @@
 import { env } from "cookied/lib/util";
-import { make_logout_action } from "cookied/lib/kit/user";
-import type { CookieOptions } from "cookied/lib/kit/session";
+import { type CookieOptions, make_logout_action } from "cookied/lib/kit/session";
 import type { Actions } from "./$types";
 
 const cookie_options: CookieOptions = {
