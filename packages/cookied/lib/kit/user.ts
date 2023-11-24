@@ -45,10 +45,9 @@ export function make_login_action(cookie_options: CookieOptions, pg_schema: stri
 			console.log("incorrect password", { form_username });
 			return {"error": "incorrect password"};
 		}
-		// Sanity check because the above is security-critical
-		A(password_is_correct);
 
 		// Create a new session in the database
+		A(password_is_correct); // Sanity check
 		const { id, secret } = await Session.create(user.id, request.headers.get("User-Agent") || "");
 
 		// Set a session cookie in the HTTP response
