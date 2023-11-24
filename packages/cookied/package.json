@@ -3,7 +3,7 @@
 	"description": "PostgreSQL-backed authentication for Node.js-based web applications",
 	"version": "0.0.1",
 	"scripts": {
-		"test": "./dev/test-schema && ./node_modules/.bin/ava && ./node_modules/.bin/tsc --target esnext --moduleResolution node --noEmit tests/*.ts && ./node_modules/.bin/eslint .",
+		"test": "../../dev/test-schema && ./node_modules/.bin/ava && ./node_modules/.bin/tsc --target esnext --moduleResolution node --noEmit tests/*.ts && ./node_modules/.bin/eslint .",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write ."
 	},
