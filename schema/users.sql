@@ -39,8 +39,8 @@ CREATE TABLE users (
 );
 
 -- After we've stabilized the table a bit
---SELECT periods.add_system_time_period('users', 'row_start', 'row_end');
---SELECT periods.add_system_versioning('users');
+SELECT periods.add_system_time_period('users', 'row_start', 'row_end');
+SELECT periods.add_system_versioning('users');
 
 CREATE UNIQUE INDEX users_lower_username_index ON users (LOWER(username));
 CREATE UNIQUE INDEX users_visual_username_index ON users (get_visual_username(username));
