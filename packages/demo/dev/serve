@@ -2,16 +2,23 @@
 
 set -eu -o pipefail
 
-here=$(dirname -- "$0")
-schema=$here/../../../schema
-cookied=$here/../../cookied
+test_usernames=("one" "two")
+test_passwords=("1" "2")
+
+export SESSION_COOKIE_NAME=s
+export SESSION_COOKIE_PATH=/
+export SESSION_COOKIE_SECURE=0
 
 DATABASE_URL=$(pg_tmp)
+
+##
+
 echo "ephemeralpg running at $DATABASE_URL"
 echo
 
-test_usernames=("one" "two")
-test_passwords=("1" "2")
+here=$(dirname -- "$0")
+schema=$here/../../../schema
+cookied=$here/../../cookied
 
 schema_name=$(grep -o -P -m 1 "^CREATE SCHEMA [\$_a-zA-Z0-9]+" "$schema"/schema.sql | cut -d " " -f 3)
 
@@ -35,9 +42,5 @@ done
 
 # https://www.prisma.io/docs/concepts/database-connectors/postgresql#arguments
 export DATABASE_URL="$("$cookied"/dev/prisma-compatible-postgres-uri "$DATABASE_URL")&schema=$schema_name"
-
-export SESSION_COOKIE_NAME=s
-export SESSION_COOKIE_PATH=/
-export SESSION_COOKIE_SECURE=0
 
 ./node_modules/.bin/vite dev --host
