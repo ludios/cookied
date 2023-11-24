@@ -2,7 +2,7 @@
 
 // Reads a password from stdin and writes an argon2id hash to stdout
 
-import { argon2id, argon2Verify } from "hash-wasm";
+import { argon2id } from "hash-wasm";
 import fs from "node:fs";
 
 const STDIN_FILENO = 0;
