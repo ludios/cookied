@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-    import type { LayoutServerData } from './$types';
+	import type { LayoutServerData } from './$types';
 
-    export let data: LayoutServerData;
+	export let data: LayoutServerData;
 </script>
 
 <style>

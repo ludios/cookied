@@ -14,13 +14,13 @@ crypto.getRandomValues(salt);
 
 // https://www.rfc-editor.org/rfc/rfc9106.html#section-4-6.2
 const key = await argon2id({
-  password: password,
-  salt,
-  parallelism: 4,
-  iterations: 3,
-  memorySize: 64 * 1024,
-  hashLength: 32,
-  outputType: "encoded",
+	password: password,
+	salt,
+	parallelism: 4,
+	iterations: 3,
+	memorySize: 64 * 1024,
+	hashLength: 32,
+	outputType: "encoded",
 });
 
 console.log(key);
