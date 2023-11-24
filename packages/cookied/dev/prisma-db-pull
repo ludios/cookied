@@ -9,12 +9,14 @@ DATABASE_URL=$(pg_tmp)
 echo "ephemeralpg running at $DATABASE_URL"
 echo
 
+schema_name=$(grep -o -P -m 1 "^CREATE SCHEMA [\$_a-zA-Z0-9]+" "$schema"/schema.sql | cut -d " " -f 3)
+
 psql -X "$DATABASE_URL" \
 	-f "$schema"/extensions.sql \
 	-f "$schema"/schema.sql
 
 # https://www.prisma.io/docs/concepts/database-connectors/postgresql#arguments
-export DATABASE_URL="$("$here"/prisma-compatible-postgres-uri "$DATABASE_URL")&schema=cookied"
+export DATABASE_URL="$("$here"/prisma-compatible-postgres-uri "$DATABASE_URL")&schema=$schema_name"
 
 # --force does not correctly preserve sessions_view.
 # https://www.prisma.io/docs/concepts/components/prisma-schema/views#adding-a-unique-identifier-to-an-introspected-view
