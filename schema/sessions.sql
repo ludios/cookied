@@ -40,7 +40,7 @@ DECLARE
     id_ bigint;
     ret RECORD;
 BEGIN
-    INSERT INTO cookied.sessions (hashed_secret, user_id, user_agent_seen_first) VALUES (hashed_secret_, user_id_, user_agent_seen_first_) RETURNING id INTO id_;
+    INSERT INTO sessions (hashed_secret, user_id, user_agent_seen_first) VALUES (hashed_secret_, user_id_, user_agent_seen_first_) RETURNING id INTO id_;
     SELECT id_, secret_ INTO ret;
     RETURN ret;
 END;
@@ -52,5 +52,5 @@ CREATE VIEW sessions_view AS
     SELECT
         sessions.*,
         users.username
-    FROM cookied.sessions
-    LEFT JOIN cookied.users ON users.id = sessions.user_id;
+    FROM sessions
+    LEFT JOIN users ON users.id = sessions.user_id;

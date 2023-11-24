@@ -24,7 +24,7 @@ export class Session {
 		return get_one_row(
 			(await prisma.$queryRaw`
 				SELECT id, secret
-				FROM cookied.new_session(${user_id}, ${user_agent})
+				FROM new_session(${user_id}, ${user_agent})
 				AS (id bigint, secret bytea);
 			`) satisfies Array<{ id: bigint; secret: Buffer }>,
 		);
@@ -32,7 +32,7 @@ export class Session {
 
 	static async delete(session_id: number): Promise<null> {
 		await prisma.$queryRaw`
-			DELETE FROM cookied.sessions
+			DELETE FROM sessions
 			WHERE id = ${session_id};
 		`;
 		return null;
