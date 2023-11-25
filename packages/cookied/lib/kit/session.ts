@@ -108,7 +108,7 @@ export function make_login_action(cookie_options: CookieOptions, already_logged_
 		}
 
 		const prisma = new PrismaClient();
-		// We have an index on LOWER(username) but not username
+		// Use queryRaw because we have an index on LOWER(username) but not username
 		const users = throw_if_gt1(
 			(await prisma.$queryRaw`
 				SELECT id, username, hashed_password
