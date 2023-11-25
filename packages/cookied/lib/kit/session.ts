@@ -96,6 +96,12 @@ export function make_login_action(cookie_options: CookieOptions, already_logged_
 		const form_username = form_data.get("username") as string;
 		const form_password = form_data.get("password") as string;
 
+		// Bail out early if possible, since users.sql doesn't allow empty usernames
+		if (!form_username) {
+			console.log("empty username", { form_username });
+			return {"error": "empty username"};
+		}
+
 		if (!form_password) {
 			console.log("empty password", { form_username });
 			return {"error": "empty password"};
