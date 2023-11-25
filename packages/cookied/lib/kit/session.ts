@@ -86,9 +86,13 @@ export function make_parse_session_cookie_hook(cookie_options: CookieOptions, go
 	};
 }
 
-export function make_login_action(cookie_options: CookieOptions) {
-	return async ({ cookies, request }: { cookies: Cookies, request: Request }) => {
-		const form_data = await request.formData();
+export function make_login_action(cookie_options: CookieOptions, already_logged_in: (event: RequestEvent) => boolean) {
+	return async (event: RequestEvent) => {
+		if (already_logged_in(event)) {
+			return {"error": "already logged in"};
+		}
+
+		const form_data = await event.request.formData();
 		const form_username = form_data.get("username") as string;
 		const form_password = form_data.get("password") as string;
 
@@ -124,11 +128,12 @@ export function make_login_action(cookie_options: CookieOptions) {
 
 		// Create a new session in the database
 		A(password_is_correct); // Sanity check
-		const { id, secret } = await Session.create(user.id, request.headers.get("User-Agent") || "");
+		const user_agent = event.request.headers.get("User-Agent");
+		const { id, secret } = await Session.create(user.id, user_agent || "");
 
 		// Set a session cookie in the HTTP response
 		const s_cookie = new SessionCookie(id, secret);
-		set_session_cookie(cookie_options, cookies, s_cookie);
+		set_session_cookie(cookie_options, event.cookies, s_cookie);
 		return {"success": true}
 	}
 }
