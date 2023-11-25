@@ -16,5 +16,5 @@
 {#if form?.success}
 	Logged in as {data.session?.username}
 {:else}
-	Login error: {form?.error}
+	Login error: {form?.error || "no form data"}
 {/if}
