@@ -80,7 +80,7 @@ export function make_parse_session_cookie_hook(cookie_options: CookieOptions, go
 	};
 }
 
-export function make_login_action(cookie_options: CookieOptions, pg_schema: string) {
+export function make_login_action(cookie_options: CookieOptions) {
 	return async ({ cookies, request }: { cookies: Cookies, request: Request }) => {
 		const form_data = await request.formData();
 		const form_username = form_data.get("username") as string;
@@ -92,13 +92,11 @@ export function make_login_action(cookie_options: CookieOptions, pg_schema: stri
 		}
 
 		const prisma = new PrismaClient();
-		// https://github.com/prisma/prisma/issues/9765#issuecomment-1528729000
-		const table = Prisma.sql([`${pg_schema}.users`]);
 		// We have an index on LOWER(username) but not username
 		const users = throw_if_gt1(
 			(await prisma.$queryRaw`
 				SELECT id, username, hashed_password
-				FROM ${table}
+				FROM users
 				WHERE LOWER(username) = ${form_username.toLowerCase()}
 			`) satisfies Array<{ id: bigint; username: string, hashed_password: string }>,
 		);
