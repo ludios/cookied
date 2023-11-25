@@ -15,7 +15,7 @@ export type CookieOptions = {
 	secure: boolean,
 }
 
-// On the `cookies` object for the response, clear our session cookie as per `cookie_options`.
+// Clear our session cookie as per `cookie_options`.
 export function clear_session_cookie(cookie_options: CookieOptions, kit_cookies: Cookies) {
 	kit_cookies.delete(cookie_options.name, {
 		path: cookie_options.path,
@@ -23,7 +23,7 @@ export function clear_session_cookie(cookie_options: CookieOptions, kit_cookies:
 	});
 }
 
-// On the `cookies` object for the response, set our session cookie `s_cookie` as per `cookie_options`.
+// Set our session cookie `session_cookie` as per `cookie_options`.
 export function set_session_cookie(cookie_options: CookieOptions, kit_cookies: Cookies, session_cookie: SessionCookie) {
 	kit_cookies.set(cookie_options.name, session_cookie.toString(), {
 		path: cookie_options.path,
@@ -44,6 +44,9 @@ type GotSessionCallback = (
 // Return a server hook function which parses and validates the session info on the session
 // cookie in the request, suitable for use in `export const handle: Handle = ...` in
 // `hooks.server.ts` in a SvelteKit application.
+//
+// Also, if the session is valid, always set the session cookie again on the response,
+// to avoid expiry.
 //
 // This is indirected partly to deal with `event.locals.session = session;` requiring
 // the `interface Locals { session: ... }` in the SvelteKit app's `app.d.ts`.
@@ -77,7 +80,9 @@ export function make_parse_session_cookie_hook(cookie_options: CookieOptions, go
 			return resolve(event);
 		}
 		got_session({ session, event });
-		return resolve(event);
+		// Set the session cookie again, to avoid expiry
+		set_session_cookie(cookie_options, event.cookies, cookie);
+		return await resolve(event);
 	};
 }
 
