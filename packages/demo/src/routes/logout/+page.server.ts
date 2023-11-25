@@ -1,13 +1,7 @@
-import { env } from "cookied/lib/util";
-import { type CookieOptions, make_logout_action } from "cookied/lib/kit/session";
-import type { Actions } from "./$types";
-
-const cookie_options: CookieOptions = {
-	name: env("SESSION_COOKIE_NAME"),
-	path: env("SESSION_COOKIE_PATH"),
-	secure: Boolean(Number(env("SESSION_COOKIE_SECURE"))),
-};
+import { make_logout_action } from "cookied/lib/kit/session";
+import type { Actions } from "@sveltejs/kit";
+import { cookie_options_from_env } from "../../util";
 
 export const actions = {
-	default: make_logout_action(cookie_options)
+	default: make_logout_action(cookie_options_from_env())
 } satisfies Actions;
