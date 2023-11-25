@@ -1,6 +1,5 @@
-import { Prisma } from '@prisma/client';
 import { BadSessionCookieError, SessionCookie } from "../session.js";
-import { MinimizedDatabaseSession, Session } from "../db/session.js";
+import { type MinimizedDatabaseSession, Session } from "../db/session.js";
 import type { Handle, Cookies, RequestEvent } from "@sveltejs/kit";
 import { throw_if_gt1 } from "../util.js";
 import { PrismaClient } from "@prisma/client";

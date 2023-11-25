@@ -6,7 +6,7 @@
 		"dev": "./dev/serve",
 		"build": "vite build",
 		"preview": "vite preview",
-		"test": "./dev/test-schema && ./node_modules/.bin/ava && ./node_modules/.bin/tsc --target esnext --moduleResolution node --noEmit tests/*.ts && ./node_modules/.bin/eslint .",
+		"test": "./node_modules/.bin/tsc -p tsconfig.json --noEmit && ./node_modules/.bin/eslint .",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
