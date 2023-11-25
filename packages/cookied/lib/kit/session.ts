@@ -16,19 +16,21 @@ export type CookieOptions = {
 }
 
 // On the `cookies` object for the response, clear our session cookie as per `cookie_options`.
-export function clear_session_cookie(cookie_options: CookieOptions, cookies: Cookies) {
-	cookies.delete(cookie_options.name, {
+export function clear_session_cookie(cookie_options: CookieOptions, kit_cookies: Cookies) {
+	kit_cookies.delete(cookie_options.name, {
 		path: cookie_options.path,
 		secure: cookie_options.secure,
 	});
 }
 
 // On the `cookies` object for the response, set our session cookie `s_cookie` as per `cookie_options`.
-export function set_session_cookie(cookie_options: CookieOptions, cookies: Cookies, s_cookie: SessionCookie) {
-	cookies.set(cookie_options.name, s_cookie.toString(), {
+export function set_session_cookie(cookie_options: CookieOptions, kit_cookies: Cookies, session_cookie: SessionCookie) {
+	kit_cookies.set(cookie_options.name, session_cookie.toString(), {
 		path: cookie_options.path,
 		secure: cookie_options.secure,
 		priority: "high",
+		// https://developer.chrome.com/blog/cookie-max-age-expires/
+		maxAge: 400 * 24 * 3600,
 	});
 }
 
