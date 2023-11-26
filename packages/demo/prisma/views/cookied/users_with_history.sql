@@ -1,0 +1,20 @@
+SELECT
+  users.id,
+  users.username,
+  users.hashed_password,
+  users.creation_time,
+  users.row_start,
+  users.row_end
+FROM
+  users
+UNION
+ALL
+SELECT
+  users_history.id,
+  users_history.username,
+  users_history.hashed_password,
+  users_history.creation_time,
+  users_history.row_start,
+  users_history.row_end
+FROM
+  users_history;

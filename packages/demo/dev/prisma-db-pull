@@ -24,4 +24,6 @@ export DATABASE_URL="$("$here"/prisma-compatible-postgres-uri "$DATABASE_URL")&s
 
 "$here"/../node_modules/.bin/prisma db pull
 
-"$here"/../node_modules/.bin/prisma generate
+# Need node_modules/bin/ in PATH to fix:
+# /bin/sh: line 1: prisma-pothos-types: command not found
+PATH="$here"/../node_modules/.bin:"$PATH" "$here"/../node_modules/.bin/prisma generate
