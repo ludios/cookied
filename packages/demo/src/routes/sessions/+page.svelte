@@ -1,0 +1,34 @@
+<svelte:head>
+	<title>Sessions</title>
+</svelte:head>
+
+<script lang="ts">
+	import type { PageData } from "./$types";
+
+	export let data: PageData;
+</script>
+
+<div class="text-column">
+	<h1>Sessions</h1>
+
+	<p>This lists all of the sessions on which you are logged in (username={data.session?.username}, id={data.session?.user_id}).</p>
+
+	<table border=1>
+		<thead>
+			<tr>
+				<th scope="col">ID</th>
+				<th scope="col">Time created</th>
+				<th scope="col">User agent when created</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#each data.my_sessions as { id, birth_time, user_agent_seen_first } (id)}
+			<tr>
+				<td>{id}</td>
+				<td>{birth_time}</td>
+				<td>{user_agent_seen_first}</td>
+			</tr>
+			{/each}
+		</tbody>
+	</table>
+</div>

@@ -18,9 +18,9 @@ export class Session {
 		`;
 	}
 
-	static async find_by_user_id(user_id: number) {
+	static async find_minimized_by_user_id(user_id: number): Promise<Array<MinimizedDatabaseSession>> {
 		return await sql`
-			SELECT id, user_id, username, birth_time, hashed_secret, user_agent_seen_first
+			SELECT id, user_id, username, birth_time, user_agent_seen_first
 			FROM cookied.sessions_view WHERE user_id = ${user_id}
 		`;
 	}
