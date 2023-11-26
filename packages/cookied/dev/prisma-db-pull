@@ -22,6 +22,4 @@ export DATABASE_URL="$("$here"/prisma-compatible-postgres-uri "$DATABASE_URL")&s
 # https://www.prisma.io/docs/concepts/components/prisma-schema/views#adding-a-unique-identifier-to-an-introspected-view
 #$here/../node_modules/.bin/prisma db pull --force
 
-"$here"/../node_modules/.bin/prisma db pull
-
-"$here"/../node_modules/.bin/prisma generate
+$here/../node_modules/.bin/prisma db pull
