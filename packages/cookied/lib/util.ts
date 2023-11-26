@@ -46,8 +46,14 @@ export function get_connection_parameters(database_uri: string) {
 		// We must pass `socket_path` as the `host` (not the `path`) because
 		// it's a directory containing a socket, not the socket itself.
 		//
-		// We use a high max_lifetime to keep the ephemeralpg alive.
-		return { ...default_connection_parameters, host: socket_path, database, max_lifetime: 2 ** 31 - 1 };
+		// We use a high max_lifetime (~24 days) to keep the ephemeralpg alive
+		// (it shuts down after not being connected-to for a minute).
+		return {
+			...default_connection_parameters,
+			host: socket_path,
+			database,
+			max_lifetime: (2 ** 31 - 1) / 1000,
+		};
 	} else {
 		const username = url.username;
 		const password = url.password;
@@ -58,7 +64,14 @@ export function get_connection_parameters(database_uri: string) {
 			throw new Error(`missing database name; should be e.g. "postgres://user:pass@host/database"`);
 		}
 		database = database.replace("/", "");
-		return { ...default_connection_parameters, username, password, host, port, database };
+		return {
+			...default_connection_parameters,
+			username,
+			password,
+			host,
+			port,
+			database,
+		};
 	}
 }
 
