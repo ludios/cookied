@@ -1,7 +1,7 @@
 /**
  * https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/
  */
- html {
+html {
 	box-sizing: border-box;
 }
 *, *:before, *:after {
@@ -9,5 +9,14 @@
 }
 
 html {
+	/* Browsers default to serif, and Times is a little too ugly */
 	font-family: sans-serif;
+}
+
+/**
+ * Workaround for https://bugs.chromium.org/p/chromium/issues/detail?id=1343169
+ * 'Bad colors for inputs, buttons, textareas and selects when using a high-contrast Windows theme'
+ */
+input, select, button, datalist, option, textarea {
+	color: #000;
 }
