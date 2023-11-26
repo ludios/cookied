@@ -6,9 +6,6 @@ CREATE TABLE sessions (
 	-- Time the session was created
 	birth_time             timestamptz  NOT NULL DEFAULT now(),
 	-- 128-bit hash of the 128-bit secret used to check whether this is really client's session
-	--
-	-- Using a uuid here to save 1 byte is too much of a hassle due to Prisma
-	-- and the conversion function we'd need.
 	hashed_secret          bytea        NOT NULL CHECK (octet_length(hashed_secret) = 16),
 	-- User agent at the time the session was created
 	user_agent_seen_first  text         NOT NULL
@@ -40,7 +37,12 @@ DECLARE
 	id_ bigint;
 	ret RECORD;
 BEGIN
-	INSERT INTO sessions (hashed_secret, user_id, user_agent_seen_first) VALUES (hashed_secret_, user_id_, user_agent_seen_first_) RETURNING id INTO id_;
+	-- This must have a schema name here: clients aren't required to have `cookied` in
+	-- their search_path, and in this case, without "cookied." here, the trigger will fail.
+	INSERT
+		INTO cookied.sessions (hashed_secret,  user_id,  user_agent_seen_first)
+		               VALUES (hashed_secret_, user_id_, user_agent_seen_first_)
+		RETURNING id INTO id_;
 	SELECT id_, secret_ INTO ret;
 	RETURN ret;
 END;

@@ -1,8 +1,7 @@
 import { BadSessionCookieError, SessionCookie } from "../session.js";
 import { type MinimizedDatabaseSession, Session } from "../db/session.js";
 import type { Handle, Cookies, RequestEvent } from "@sveltejs/kit";
-import { throw_if_gt1 } from "../util.js";
-import { PrismaClient } from "@prisma/client";
+import { throw_if_gt1, sql } from "../util.js";
 import { argon2Verify } from "hash-wasm";
 import { A } from "ayy";
 
@@ -107,14 +106,12 @@ export function make_login_action(cookie_options: CookieOptions, already_logged_
 			return {"error": "empty password"};
 		}
 
-		const prisma = new PrismaClient();
-		// Use queryRaw because we have an index on LOWER(username) but not username
 		const users = throw_if_gt1(
-			(await prisma.$queryRaw`
+			(await sql`
 				SELECT id, username, hashed_password
-				FROM users
+				FROM cookied.users
 				WHERE LOWER(username) = ${form_username.toLowerCase()}
-			`) satisfies Array<{ id: bigint; username: string, hashed_password: string }>,
+			`) satisfies Array<{ id: number; username: string, hashed_password: string }>,
 		);
 		// Sanity-check the row from the database: ensure username match
 		if (!(users.length && users[0].username.toLowerCase() === form_username.toLowerCase())) {
@@ -150,7 +147,7 @@ export function make_logout_action(cookie_options: CookieOptions) {
 
 		if (session?.id) {
 			// Remove the session from the database
-			Session.delete(session.id);
+			Session.delete_by_ids([session.id]);
 		} else {
 			console.log("no session to log out");
 		}

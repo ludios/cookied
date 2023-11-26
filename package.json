@@ -4,9 +4,6 @@
 	"description": "monorepo for cookied and a demo site in SvelteKit",
 	"private": true,
 	"type": "module",
-	"dependencies": {
-		"@prisma/client": "^5.6.0"
-	},
 	"devDependencies": {
 		"@types/cookie": "^0.5.4",
 		"@types/node": "^20.10.0",

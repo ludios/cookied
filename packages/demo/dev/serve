@@ -9,11 +9,11 @@ export SESSION_COOKIE_NAME=s
 export SESSION_COOKIE_PATH=/
 export SESSION_COOKIE_SECURE=0
 
-DATABASE_URL=$(pg_tmp)
+export DATABASE_URI=$(pg_tmp)
 
 ##
 
-echo "ephemeralpg running at $DATABASE_URL"
+echo "ephemeralpg running at $DATABASE_URI"
 echo
 
 here=$(dirname -- "$0")
@@ -22,7 +22,7 @@ cookied=$here/../../cookied
 
 schema_name=$(grep -o -P -m 1 "^CREATE SCHEMA [\$_a-zA-Z0-9]+" "$schema"/schema.sql | cut -d " " -f 3)
 
-psql -X "$DATABASE_URL" \
+psql -X "$DATABASE_URI" \
 	-f "$schema"/extensions.sql \
 	-f "$schema"/schema.sql
 
@@ -33,14 +33,13 @@ for i in "${!test_usernames[@]}"; do
 	username="${test_usernames[i]}"
 	password="${test_passwords[i]}"
 	hashed_password=$(echo -n "$password" | "$cookied"/dev/hash-password.mjs)
-	psql -X --quiet "$DATABASE_URL" \
+	psql -X --quiet "$DATABASE_URI" \
 		-c "INSERT INTO $schema_name.users (username, hashed_password) VALUES ('$username', '$hashed_password')"
 	echo " Username: $username"
 	echo " Password: $password"
 	echo
 done
 
-# https://www.prisma.io/docs/concepts/database-connectors/postgresql#arguments
-export DATABASE_URL="$("$cookied"/dev/prisma-compatible-postgres-uri "$DATABASE_URL")&schema=$schema_name"
+export DATABASE_URI="$(prisma-compatible-postgres-uri "$DATABASE_URI")"
 
 ./node_modules/.bin/vite dev --host
