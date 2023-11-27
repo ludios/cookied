@@ -35,10 +35,11 @@ export class Session {
 		);
 	}
 
-	static async delete_by_ids(session_ids: [number]): Promise<void> {
+	static async delete_by_ids_and_user_id(session_ids: [number], user_id: number): Promise<void> {
 		await sql`
 			DELETE FROM cookied.sessions
 			WHERE id = ANY(${session_ids})
+			AND user_id = ${user_id}
 		`;
 	}
 

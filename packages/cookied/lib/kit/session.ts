@@ -145,9 +145,9 @@ export function make_logout_action(cookie_options: CookieOptions) {
 	return async ({ cookies, locals }: { cookies: Cookies, locals: unknown }) => {
 		const { session } = locals as { session: MinimizedDatabaseSession };
 
-		if (session?.id) {
+		if (session) {
 			// Remove the session from the database
-			Session.delete_by_ids([session.id]);
+			Session.delete_by_ids_and_user_id([session.id], session.user_id);
 		} else {
 			console.log("no session to log out");
 		}
