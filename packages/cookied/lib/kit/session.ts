@@ -111,7 +111,7 @@ export function make_login_action(cookie_options: CookieOptions, already_logged_
 				SELECT id, username, hashed_password
 				FROM cookied.users
 				WHERE LOWER(username) = ${form_username.toLowerCase()}
-			`) satisfies Array<{ id: number; username: string, hashed_password: string }>,
+			`) satisfies ReadonlyArray<{ id: number; username: string, hashed_password: string }>,
 		);
 		// Sanity-check the row from the database: ensure username match
 		if (!(users.length && users[0].username.toLowerCase() === form_username.toLowerCase())) {

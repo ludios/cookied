@@ -8,14 +8,14 @@ export function env(name: string): string {
 	throw Error(`${name} must be set`);
 }
 
-export function throw_if_gt1<T>(rows: Array<T>): Array<T> {
+export function throw_if_gt1<T>(rows: ReadonlyArray<T>): ReadonlyArray<T> {
 	if (rows.length > 1) {
 		throw Error(`expected 0 or 1 rows, got ${rows.length} rows: ${inspect(rows)}`);
 	}
 	return rows;
 }
 
-export function get_one_row<T>(rows: Array<T>): T {
+export function get_one_row<T>(rows: ReadonlyArray<T>): T {
 	if (rows.length !== 1) {
 		throw Error(`expected 1 row, got ${rows.length} rows: ${inspect(rows)}`);
 	}

@@ -15,14 +15,14 @@ export type DatabaseSession = MinimizedDatabaseSession & {
 };
 
 export class Session {
-	static async find_by_ids(session_ids: [number]): Promise<Array<DatabaseSession>> {
+	static async find_by_ids(session_ids: [number]): Promise<ReadonlyArray<DatabaseSession>> {
 		return await sql`
 			SELECT id, user_id, username, birth_time, hashed_secret, user_agent_seen_first
 			FROM cookied.sessions_view WHERE id = ANY(${session_ids})
 		`;
 	}
 
-	static async find_minimized_by_user_id(user_id: number): Promise<Array<MinimizedDatabaseSession>> {
+	static async find_minimized_by_user_id(user_id: number): Promise<ReadonlyArray<MinimizedDatabaseSession>> {
 		return await sql`
 			SELECT id, user_id, username, birth_time, user_agent_seen_first
 			FROM cookied.sessions_view WHERE user_id = ${user_id}
