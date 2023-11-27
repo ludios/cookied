@@ -32,23 +32,23 @@
 				<tr>
 					<th scope="col"></th>
 					<th scope="col">ID</th>
-					<th scope="col">Time created</th>
+					<th scope="col">Creation time</th>
 					<th scope="col">User agent when created</th>
 				</tr>
 			</thead>
 			<tbody>
 				{#each data.my_sessions as { id, birth_time, user_agent_seen_first } (id)}
 					<tr>
-						<td>
+						<td class="session_button">
 							{#if id == data.session.id}
-								Current&nbsp;session
+								Current session
 							{:else}
 								<button on:click={() => remove_session(id)}>Remove</button>
 							{/if}
 						</td>
-						<td>{id}</td>
-						<td>{birth_time.toISOString()}</td>
-						<td>{user_agent_seen_first}</td>
+						<td class="session_id">{id}</td>
+						<td class="session_birth_time">{birth_time.toISOString()}</td>
+						<td class="session_user_agent">{user_agent_seen_first}</td>
 					</tr>
 				{/each}
 			</tbody>
@@ -59,5 +59,18 @@
 <style>
 	td > button {
 		width: 100%;
+	}
+
+	td.session_button {
+		white-space: nowrap;
+	}
+
+	td.session_id {
+		text-align: right;
+	}
+
+	td.session_id,
+	td.session_birth_time {
+		font-variant-numeric: tabular-nums
 	}
 </style>
