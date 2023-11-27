@@ -24,8 +24,7 @@
 		<p>You are logged out, so you have no user for which to show corresponding sessions.</p>
 	{:else}
 		<p>
-			This lists all of the sessions on which you are logged in (username={data.session.username},
-			id={data.session.user_id}).
+			This lists all of the sessions through which you are logged in as your user.
 		</p>
 
 		<table border="1">
