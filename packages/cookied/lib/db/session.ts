@@ -10,8 +10,12 @@ export type MinimizedDatabaseSession = {
 	username: string;
 };
 
+export type DatabaseSession = MinimizedDatabaseSession & {
+	hashed_secret: Buffer,
+};
+
 export class Session {
-	static async find_by_ids(session_ids: [number]) {
+	static async find_by_ids(session_ids: [number]): Promise<Array<DatabaseSession>> {
 		return await sql`
 			SELECT id, user_id, username, birth_time, hashed_secret, user_agent_seen_first
 			FROM cookied.sessions_view WHERE id = ANY(${session_ids})
