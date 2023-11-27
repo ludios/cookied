@@ -47,7 +47,7 @@
 							{/if}
 						</td>
 						<td>{id}</td>
-						<td>{birth_time}</td>
+						<td>{birth_time.toISOString()}</td>
 						<td>{user_agent_seen_first}</td>
 					</tr>
 				{/each}
