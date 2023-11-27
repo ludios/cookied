@@ -5,7 +5,10 @@
 	export let data: PageData;
 
 	async function remove_session(id: number) {
-		await fetch(`/api/sessions/${id}`, { method: "DELETE" });
+		const obj = await (await fetch(`/api/sessions/${id}`, { method: "DELETE" })).json();
+		if (!obj.success) {
+			console.log(`DELETE /api/sessions/${id} returned`, obj);
+		}
 		await invalidateAll();
 	}
 </script>
