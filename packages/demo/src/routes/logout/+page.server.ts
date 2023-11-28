@@ -1,7 +1,10 @@
-import { make_logout_action } from "cookied/lib/kit/session";
 import type { Actions } from "@sveltejs/kit";
 import { cookie_options_from_env } from "../../util";
+import { database_config } from "../../util";
+import { SessionKit } from "cookied/lib/kit/session";
+
+const sk = new SessionKit(database_config, cookie_options_from_env());
 
 export const actions = {
-	default: make_logout_action(cookie_options_from_env())
+	default: sk.make_logout_action()
 } satisfies Actions;
