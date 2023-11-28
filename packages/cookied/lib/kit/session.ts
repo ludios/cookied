@@ -1,18 +1,18 @@
-import { BadSessionCookieError, SessionCookie } from "../session.js";
-import { type MinimizedDatabaseSession, Session } from "../db/session.js";
-import type { Handle, Cookies, RequestEvent } from "@sveltejs/kit";
-import { throw_if_gt1, sql } from "../util.js";
-import { argon2Verify } from "hash-wasm";
+import type { Cookies, Handle, RequestEvent } from "@sveltejs/kit";
 import { A } from "ayy";
+import { argon2Verify } from "hash-wasm";
+import { type MinimizedDatabaseSession, Session } from "../db/session.js";
+import { BadSessionCookieError, SessionCookie } from "../session.js";
+import { sql, throw_if_gt1 } from "../util.js";
 
 export type CookieOptions = {
 	// Name for the session cookie, e.g. "s" or some other name unique for the domain
-	name: string,
+	name: string;
 	// The path under which the cookie is valid. Should usually be "/".
-	path: string,
+	path: string;
 	// Whether the cookie should be valid on HTTPS only.
-	secure: boolean,
-}
+	secure: boolean;
+};
 
 // Clear our session cookie as per `cookie_options`.
 export function clear_session_cookie(cookie_options: CookieOptions, kit_cookies: Cookies) {
@@ -33,12 +33,13 @@ export function set_session_cookie(cookie_options: CookieOptions, kit_cookies: C
 	});
 }
 
-type GotSessionCallback = (
-	{ session, event }: {
-		session: MinimizedDatabaseSession,
-		event: RequestEvent
-	}
-) => void;
+type GotSessionCallback = ({
+	session,
+	event,
+}: {
+	session: MinimizedDatabaseSession;
+	event: RequestEvent;
+}) => void;
 
 // Return a server hook function which parses and validates the session info on the session
 // cookie in the request, suitable for use in `export const handle: Handle = ...` in
@@ -88,7 +89,7 @@ export function make_parse_session_cookie_hook(cookie_options: CookieOptions, go
 export function make_login_action(cookie_options: CookieOptions, already_logged_in: (event: RequestEvent) => boolean) {
 	return async (event: RequestEvent) => {
 		if (already_logged_in(event)) {
-			return {"error": "already logged in"};
+			return { error: "already logged in" };
 		}
 
 		const form_data = await event.request.formData();
@@ -98,12 +99,12 @@ export function make_login_action(cookie_options: CookieOptions, already_logged_
 		// Bail out early if possible, since users.sql doesn't allow empty usernames
 		if (!form_username) {
 			console.log("empty username", { form_username });
-			return {"error": "empty username"};
+			return { error: "empty username" };
 		}
 
 		if (!form_password) {
 			console.log("empty password", { form_username });
-			return {"error": "empty password"};
+			return { error: "empty password" };
 		}
 
 		const users = throw_if_gt1(
@@ -111,12 +112,12 @@ export function make_login_action(cookie_options: CookieOptions, already_logged_
 				SELECT id, username, hashed_password
 				FROM cookied.users
 				WHERE LOWER(username) = ${form_username.toLowerCase()}
-			`) satisfies ReadonlyArray<{ id: number; username: string, hashed_password: string }>,
+			`) satisfies ReadonlyArray<{ id: number; username: string; hashed_password: string }>,
 		);
 		// Sanity-check the row from the database: ensure username match
 		if (!(users.length && users[0].username.toLowerCase() === form_username.toLowerCase())) {
 			console.log("no such user", { form_username });
-			return {"error": "no such user"};
+			return { error: "no such user" };
 		}
 		const user = users[0];
 
@@ -126,7 +127,7 @@ export function make_login_action(cookie_options: CookieOptions, already_logged_
 		});
 		if (!password_is_correct) {
 			console.log("incorrect password", { form_username });
-			return {"error": "incorrect password"};
+			return { error: "incorrect password" };
 		}
 
 		// Create a new session in the database
@@ -137,12 +138,12 @@ export function make_login_action(cookie_options: CookieOptions, already_logged_
 		// Set a session cookie in the HTTP response
 		const s_cookie = new SessionCookie(id, secret);
 		set_session_cookie(cookie_options, event.cookies, s_cookie);
-		return {"success": true}
-	}
+		return { success: true };
+	};
 }
 
 export function make_logout_action(cookie_options: CookieOptions) {
-	return async ({ cookies, locals }: { cookies: Cookies, locals: unknown }) => {
+	return async ({ cookies, locals }: { cookies: Cookies; locals: unknown }) => {
 		const { session } = locals as { session: MinimizedDatabaseSession };
 
 		if (session) {
@@ -153,5 +154,5 @@ export function make_logout_action(cookie_options: CookieOptions) {
 		}
 
 		clear_session_cookie(cookie_options, cookies);
-	}
+	};
 }

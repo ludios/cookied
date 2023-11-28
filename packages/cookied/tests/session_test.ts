@@ -4,10 +4,10 @@ import { BadSessionCookieError, SessionCookie } from "../lib/session.js";
 
 test("new SessionCookie", (t) => {
 	new SessionCookie(1, Buffer.alloc(16));
-	t.throws(() => new SessionCookie(0,       Buffer.alloc(15)), { instanceOf: AssertionError }); // id < 1
+	t.throws(() => new SessionCookie(0, Buffer.alloc(15)), { instanceOf: AssertionError }); // id < 1
 	t.throws(() => new SessionCookie(2 ** 53, Buffer.alloc(16)), { instanceOf: AssertionError }); // id > 2 ** 53 - 1
-	t.throws(() => new SessionCookie(1,       Buffer.alloc(15)), { instanceOf: AssertionError }); // wrong secret length
-	t.throws(() => new SessionCookie(1,       Buffer.alloc(17)), { instanceOf: AssertionError }); // wrong secret length
+	t.throws(() => new SessionCookie(1, Buffer.alloc(15)), { instanceOf: AssertionError }); // wrong secret length
+	t.throws(() => new SessionCookie(1, Buffer.alloc(17)), { instanceOf: AssertionError }); // wrong secret length
 });
 
 test("SessionCookie.parse", (t) => {

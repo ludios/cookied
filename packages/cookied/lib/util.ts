@@ -1,5 +1,5 @@
-import postgres from "postgres";
 import { inspect } from "util";
+import postgres from "postgres";
 
 export function env(name: string): string {
 	if (Object.hasOwn(process.env, name)) {
@@ -35,12 +35,14 @@ export function get_connection_parameters(database_uri: string) {
 	}
 	// the directory containing the UNIX socket in e.g.
 	// "postgresql:///test?host=%2Ftmp%2Fephemeralpg.Xha6ii"
-	const socket_path = url.searchParams.get('host');
+	const socket_path = url.searchParams.get("host");
 	if (socket_path != null) {
 		let database = url.pathname;
 		if (!database.startsWith("/")) {
-			throw new Error(`expected pathname to start with "/", i.e. 3 slashes before ` +
-				`the database name "test" in "postgresql:///test?host=%2Ftmp%2Fephemeralpg.Xha6ii"`);
+			throw new Error(
+				`expected pathname to start with "/", i.e. 3 slashes before ` +
+					`the database name "test" in "postgresql:///test?host=%2Ftmp%2Fephemeralpg.Xha6ii"`,
+			);
 		}
 		database = database.replace("/", "");
 		// We must pass `socket_path` as the `host` (not the `path`) because
@@ -54,25 +56,24 @@ export function get_connection_parameters(database_uri: string) {
 			database,
 			max_lifetime: (2 ** 31 - 1) / 1000,
 		};
-	} else {
-		const username = url.username;
-		const password = url.password;
-		const host = url.hostname;
-		const port = url.port ? Number(url.port) : undefined;
-		let database = url.pathname;
-		if (!database.startsWith("/")) {
-			throw new Error(`missing database name; should be e.g. "postgres://user:pass@host/database"`);
-		}
-		database = database.replace("/", "");
-		return {
-			...default_connection_parameters,
-			username,
-			password,
-			host,
-			port,
-			database,
-		};
 	}
+	const username = url.username;
+	const password = url.password;
+	const host = url.hostname;
+	const port = url.port ? Number(url.port) : undefined;
+	let database = url.pathname;
+	if (!database.startsWith("/")) {
+		throw new Error(`missing database name; should be e.g. "postgres://user:pass@host/database"`);
+	}
+	database = database.replace("/", "");
+	return {
+		...default_connection_parameters,
+		username,
+		password,
+		host,
+		port,
+		database,
+	};
 }
 
 export function dbg<T>(obj: T): T {

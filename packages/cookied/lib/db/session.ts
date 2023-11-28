@@ -11,7 +11,7 @@ export type MinimizedDatabaseSession = {
 };
 
 export type DatabaseSession = MinimizedDatabaseSession & {
-	hashed_secret: Buffer,
+	hashed_secret: Buffer;
 };
 
 export class Session {
