@@ -122,7 +122,7 @@ export class SessionKit {
 			const users = throw_if_gt1(
 				(await sql`
 					SELECT id, username, hashed_password
-					FROM ${this.#database_config.identifiers.users}
+					FROM ${sql(this.#database_config.identifiers.users)}
 					WHERE LOWER(username) = ${form_username.toLowerCase()}
 				`) satisfies ReadonlyArray<{ id: number; username: string; hashed_password: string }>,
 			);
