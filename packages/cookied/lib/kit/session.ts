@@ -2,7 +2,7 @@ import type { Cookies, Handle, RequestEvent } from "@sveltejs/kit";
 import { A } from "ayy";
 import { argon2Verify } from "hash-wasm";
 import { type MinimizedDatabaseSession, SessionsQuery } from "../db/session.js";
-import { Config } from "../db/config.js";
+import type { Config } from "../db/config.js";
 import { BadSessionCookieError, SessionCookie } from "../session.js";
 import { sql, throw_if_gt1 } from "../util.js";
 
