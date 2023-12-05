@@ -81,4 +81,4 @@ export function dbg<T>(obj: T): T {
 	return obj;
 }
 
-export const sql = postgres(dbg(get_connection_parameters(env("DATABASE_URI"))));
+export const sql = postgres(get_connection_parameters(env("DATABASE_URI")));
