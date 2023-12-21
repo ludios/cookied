@@ -19,9 +19,9 @@
 		"hash-wasm": "^4.11.0"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "^2.1.1",
-		"@sveltejs/kit": "^1.30.3",
-		"ava": "^5.3.1",
+		"@sveltejs/adapter-auto": "^3.0.1",
+		"@sveltejs/kit": "^2.0.5",
+		"ava": "^6.0.1",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.35.1",
@@ -33,7 +33,7 @@
 		"tslib": "^2.6.2",
 		"tsx": "^4.7.0",
 		"typescript": "^5.3.3",
-		"vite": "^4.5.1"
+		"vite": "^5.0.10"
 	},
 	"ava": {
 		"extensions": {

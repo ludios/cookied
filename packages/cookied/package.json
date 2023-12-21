@@ -14,7 +14,7 @@
 		"postgres": "^3.4.3"
 	},
 	"peerDependencies": {
-		"@sveltejs/kit": "^1.27.6"
+		"@sveltejs/kit": "^2.0.5"
 	},
 	"devDependencies": {
 		"ava": "^6.0.1",
