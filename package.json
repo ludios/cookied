@@ -5,14 +5,14 @@
 	"private": true,
 	"type": "module",
 	"devDependencies": {
-		"@types/cookie": "^0.5.4",
-		"@types/node": "^20.11.0",
-		"@typescript-eslint/eslint-plugin": "^6.18.1",
-		"@typescript-eslint/parser": "^6.18.1"
+		"@types/cookie": "^0.6.0",
+		"@types/node": "^20.11.8",
+		"@typescript-eslint/eslint-plugin": "^6.19.1",
+		"@typescript-eslint/parser": "^6.19.1"
 	},
 	"pnpm": {
 		"overrides": {
-			"esbuild": "^0.19.10",
+			"esbuild": "^0.20.0",
 			"rollup": "npm:@rollup/wasm-node"
 		}
 	}
