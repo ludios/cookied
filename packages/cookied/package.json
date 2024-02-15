@@ -17,9 +17,9 @@
 		"@sveltejs/kit": "^2.0.5"
 	},
 	"devDependencies": {
-		"ava": "^6.1.0",
+		"ava": "^6.1.1",
 		"eslint": "^8.56.0",
-		"tsx": "^4.7.0",
+		"tsx": "^4.7.1",
 		"typescript": "^5.3.3"
 	},
 	"ava": {
