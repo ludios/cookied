@@ -10,7 +10,14 @@
 	},
 	"type": "module",
 	"exports": {
-		".": "./dist/"
+		"./*": "./dist/*"
+	},
+	"typesVersions": {
+		"*": {
+			"*": [
+				"dist/*"
+			]
+		}
 	},
 	"dependencies": {
 		"ayy": "^3.0.0",
