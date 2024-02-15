@@ -1,13 +1,17 @@
 {
 	"name": "cookied",
 	"description": "PostgreSQL-backed authentication for Node.js-based web applications",
-	"version": "0.0.1",
+	"version": "0.2.0",
 	"scripts": {
+		"build": "./node_modules/.bin/tsc",
 		"test": "../../dev/test-schema && ./node_modules/.bin/ava && ./node_modules/.bin/tsc --target esnext --moduleResolution node --noEmit tests/*.ts && ./node_modules/.bin/eslint .",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"type": "module",
+	"exports": {
+		".": "./dist/"
+	},
 	"dependencies": {
 		"ayy": "^3.0.0",
 		"hash-wasm": "^4.11.0",
