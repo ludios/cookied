@@ -44,10 +44,14 @@ export class SessionKit {
 
 	// Set our session cookie `session_cookie` as per `cookie_options`.
 	#set_session_cookie(kit_cookies: Cookies, session_cookie: SessionCookie) {
+		const expires = new Date();
+		expires.setDate(expires.getDate() + 400);
 		kit_cookies.set(this.#cookie_options.name, session_cookie.toString(), {
 			path: this.#cookie_options.path,
 			secure: this.#cookie_options.secure,
 			priority: "high",
+			// Might need to be set for Bromite to keep the cookie
+			expires,
 			// https://developer.chrome.com/blog/cookie-max-age-expires/
 			maxAge: 400 * 24 * 3600,
 		});

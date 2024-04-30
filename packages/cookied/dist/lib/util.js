@@ -1,4 +1,4 @@
-import { inspect } from "util";
+import { inspect } from "node:util";
 import postgres from "postgres";
 export function env(name) {
     if (Object.hasOwn(process.env, name)) {
