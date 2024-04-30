@@ -12,7 +12,7 @@
 	},
 	"pnpm": {
 		"overrides": {
-			"esbuild": "^0.20.0",
+			"esbuild": "^0.20.2",
 			"rollup": "npm:@rollup/wasm-node"
 		}
 	}
