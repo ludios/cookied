@@ -10,7 +10,7 @@ CREATE TABLE sessions (
 	-- User agent at the time the session was created
 	user_agent_seen_first  text         NOT NULL
 );
--- After we've stabilized the table a bit
+
 SELECT periods.add_system_time_period('sessions', 'row_start', 'row_end');
 SELECT periods.add_system_versioning('sessions');
 

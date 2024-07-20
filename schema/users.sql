@@ -38,7 +38,6 @@ CREATE TABLE users (
 	creation_time    timestamptz  NOT NULL DEFAULT now()
 );
 
--- After we've stabilized the table a bit
 SELECT periods.add_system_time_period('users', 'row_start', 'row_end');
 SELECT periods.add_system_versioning('users');
 
