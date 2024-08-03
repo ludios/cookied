@@ -40,6 +40,4 @@ for i in "${!test_usernames[@]}"; do
 	echo
 done
 
-export DATABASE_URI="$(prisma-compatible-postgres-uri "$DATABASE_URI")"
-
 ./node_modules/.bin/vite dev --host
