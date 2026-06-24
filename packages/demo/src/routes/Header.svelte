@@ -2,7 +2,11 @@
 	import { page } from '$app/stores';
 	import type { LayoutServerData } from './$types';
 
-	export let data: LayoutServerData;
+	interface Props {
+		data: LayoutServerData;
+	}
+
+	let { data }: Props = $props();
 </script>
 
 <style>

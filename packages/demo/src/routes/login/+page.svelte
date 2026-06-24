@@ -4,8 +4,12 @@
 	import type { LayoutData } from "../$types";
 	import type { ActionData } from "./$types";
 
-	export let data: LayoutData;
-	export let form: ActionData;
+	interface Props {
+		data: LayoutData;
+		form: ActionData;
+	}
+
+	let { data, form }: Props = $props();
 
 	onMount(() => {
 		// Prevent Header from showing stale session data

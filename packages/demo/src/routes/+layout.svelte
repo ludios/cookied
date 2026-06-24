@@ -3,11 +3,16 @@
 	import Header from './Header.svelte';
 	import './styles.css';
 
-	export let data: LayoutServerData;
+	interface Props {
+		data: LayoutServerData;
+		children?: import('svelte').Snippet;
+	}
+
+	let { data, children }: Props = $props();
 </script>
 
 <Header data={data} />
 
 <main>
-	<slot />
+	{@render children?.()}
 </main>

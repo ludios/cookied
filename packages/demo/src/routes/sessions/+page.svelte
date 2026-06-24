@@ -2,7 +2,11 @@
 	import type { PageData } from "./$types";
 	import { invalidateAll } from "$app/navigation";
 
-	export let data: PageData;
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 
 	async function remove_session(id: number) {
 		const obj = await (await fetch(`/api/sessions/${id}`, { method: "DELETE" })).json();
@@ -43,7 +47,7 @@
 							{#if id == data.session.id}
 								Current session
 							{:else}
-								<button on:click={() => remove_session(id)}>Remove</button>
+								<button onclick={() => remove_session(id)}>Remove</button>
 							{/if}
 						</td>
 						<td class="session_id">{id}</td>
