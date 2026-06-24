@@ -1,6 +1,6 @@
 
 
-import { SessionsQuery, type MinimizedDatabaseSession } from "cookied/lib/db/session";
+import { SessionsQuery, type MinimizedDatabaseSession } from "cookied/lib/db/session.js";
 import { database_config } from "../../util";
 import type { PageServerLoad } from './$types';
 
