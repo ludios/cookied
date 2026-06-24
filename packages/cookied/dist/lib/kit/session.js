@@ -47,7 +47,7 @@ export class SessionKit {
     make_parse_session_cookie_hook(got_session) {
         return async ({ event, resolve }) => {
             const cookies = event.cookies;
-            //console.debug("cookies from client", cookies.getAll());
+            logger.debug("cookies from client {all}", () => ({ all: cookies.getAll() }));
             const s_cookie = cookies.get(this.#cookie_options.name);
             if (!s_cookie) {
                 return resolve(event);
