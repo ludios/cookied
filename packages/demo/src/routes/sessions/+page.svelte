@@ -1,12 +1,8 @@
 <script lang="ts">
-	import type { PageData } from "./$types";
+	import type { PageProps } from "./$types";
 	import { invalidateAll } from "$app/navigation";
 
-	interface Props {
-		data: PageData;
-	}
-
-	let { data }: Props = $props();
+	let { data }: PageProps = $props();
 
 	async function remove_session(id: number) {
 		const obj = await (await fetch(`/api/sessions/${id}`, { method: "DELETE" })).json();

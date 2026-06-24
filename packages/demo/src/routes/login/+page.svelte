@@ -1,15 +1,9 @@
 <script lang="ts">
 	import { invalidateAll } from "$app/navigation";
 	import { onMount } from "svelte";
-	import type { LayoutData } from "../$types";
-	import type { ActionData } from "./$types";
+	import type { PageProps } from "./$types";
 
-	interface Props {
-		data: LayoutData;
-		form: ActionData;
-	}
-
-	let { data, form }: Props = $props();
+	let { data, form }: PageProps = $props();
 
 	onMount(() => {
 		// Prevent Header from showing stale session data

@@ -1,14 +1,9 @@
 <script lang="ts">
-	import type { LayoutServerData } from './$types';
+	import type { LayoutProps } from './$types';
 	import Header from './Header.svelte';
 	import './styles.css';
 
-	interface Props {
-		data: LayoutServerData;
-		children?: import('svelte').Snippet;
-	}
-
-	let { data, children }: Props = $props();
+	let { data, children }: LayoutProps = $props();
 </script>
 
 <Header data={data} />
