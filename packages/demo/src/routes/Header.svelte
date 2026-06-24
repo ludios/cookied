@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import type { LayoutServerData } from './$types';
 
 	interface Props {
@@ -51,13 +51,13 @@
 
 		<hr>
 
-		<div aria-current={$page.url.pathname === "/" ? "page" : null}>
+		<div aria-current={page.url.pathname === "/" ? "page" : null}>
 			<a href="/">Home</a>
 		</div>
-		<div aria-current={$page.url.pathname === "/sessions" ? "page" : null}>
+		<div aria-current={page.url.pathname === "/sessions" ? "page" : null}>
 			<a href="/sessions">Sessions</a>
 		</div>
-		<div aria-current={$page.url.pathname === "/about" ? "page" : null}>
+		<div aria-current={page.url.pathname === "/about" ? "page" : null}>
 			<a href="/about">About</a>
 		</div>
 	</nav>
