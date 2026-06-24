@@ -23,10 +23,6 @@
 		"**/dist/**"
 	],
 
-	"jsPlugins": [
-		{ "name": "@logtape", "specifier": "@logtape/lint/eslint" }
-	],
-
 	"rules": {
 		"import/no-cycle": ["error", { "maxDepth": 8 }],
 		"no-console": ["warn", { "allow": ["warn", "error"] }],
