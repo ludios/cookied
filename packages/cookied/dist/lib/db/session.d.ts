@@ -1,4 +1,3 @@
-/// <reference types="node" resolution-mode="require"/>
 import type { SessionCookie } from "../session.js";
 import type { Config } from "./config.js";
 export type MinimizedDatabaseSession = {

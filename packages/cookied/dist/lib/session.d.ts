@@ -1,4 +1,3 @@
-/// <reference types="node" resolution-mode="require"/>
 export declare class BadSessionCookieError extends Error {
 }
 export declare class SessionCookie {

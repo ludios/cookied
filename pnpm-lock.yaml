@@ -20,6 +20,9 @@ importers:
 
   packages/cookied:
     dependencies:
+      '@logtape/logtape':
+        specifier: ^2.2.1
+        version: 2.2.1
       '@sveltejs/kit':
         specifier: ^2.0.5
         version: 2.67.0(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.62.0))(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(tsx@4.22.4)))(svelte@5.56.3(@typescript-eslint/types@8.62.0))(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(tsx@4.22.4))
@@ -58,6 +61,9 @@ importers:
         specifier: ^4.12.0
         version: 4.12.0
     devDependencies:
+      '@logtape/logtape':
+        specifier: ^2.2.1
+        version: 2.2.1
       '@sveltejs/adapter-auto':
         specifier: ^7.0.1
         version: 7.0.1(@sveltejs/kit@2.67.0(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.62.0))(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(tsx@4.22.4)))(svelte@5.56.3(@typescript-eslint/types@8.62.0))(typescript@6.0.3)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(tsx@4.22.4)))
@@ -346,6 +352,9 @@ packages:
     peerDependenciesMeta:
       eslint:
         optional: true
+
+  '@logtape/logtape@2.2.1':
+    resolution: {integrity: sha512-SkRptJUEAbGuf+/blXDxDa8sSq8no+lxJlfwPTMzrHIULOMsNZRaqT2qF3H9tmGOsaLYc+uF3orRCQfoH0qKzA==}
 
   '@mapbox/node-pre-gyp@2.0.3':
     resolution: {integrity: sha512-uwPAhccfFJlsfCxMYTwOdVfOz3xqyj8xYL3zJj8f0pb30tLohnnFPhLuqp4/qoEz8sNxe4SESZedcBojRefIzg==}
@@ -1910,6 +1919,8 @@ snapshots:
   '@logtape/lint@2.2.0(eslint@10.5.0)':
     optionalDependencies:
       eslint: 10.5.0
+
+  '@logtape/logtape@2.2.1': {}
 
   '@mapbox/node-pre-gyp@2.0.3':
     dependencies:

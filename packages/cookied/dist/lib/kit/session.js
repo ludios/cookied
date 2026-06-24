@@ -3,6 +3,8 @@ import { argon2Verify } from "hash-wasm";
 import { SessionsQuery } from "../db/session.js";
 import { BadSessionCookieError, SessionCookie } from "../session.js";
 import { sql, throw_if_gt1 } from "../util.js";
+import { getLogger } from "@logtape/logtape";
+const logger = getLogger(["cookied"]);
 export class SessionKit {
     #database_config;
     #cookie_options;
@@ -56,7 +58,7 @@ export class SessionKit {
             }
             catch (e) {
                 if (e instanceof BadSessionCookieError) {
-                    console.debug("session cookie failed to parse, clearing it", { s_cookie });
+                    logger.warn("session cookie {s_cookie} failed to parse, clearing it", { s_cookie });
                     this.#clear_session_cookie(cookies);
                 }
                 else {
@@ -68,7 +70,7 @@ export class SessionKit {
             }
             const session = await this.#sessions_query.validate(cookie);
             if (!session) {
-                console.debug("session cookie references session not in database, clearing cookie", { cookie });
+                logger.warn("session cookie {cookie} references session not in database, clearing cookie", { cookie });
                 cookie = null;
                 this.#clear_session_cookie(cookies);
                 return resolve(event);
@@ -89,11 +91,11 @@ export class SessionKit {
             const form_password = form_data.get("password");
             // Bail out early if possible, since users.sql doesn't allow empty usernames
             if (!form_username) {
-                console.log("empty username", { form_username });
+                logger.info("empty username {form_username}", { form_username });
                 return { error: "empty username" };
             }
             if (!form_password) {
-                console.log("empty password", { form_username });
+                logger.info("empty password provided by {form_username}", { form_username });
                 return { error: "empty password" };
             }
             const users = throw_if_gt1((await sql `
@@ -103,7 +105,7 @@ export class SessionKit {
 				`));
             // Sanity-check the row from the database: ensure username match
             if (!(users.length && users[0].username.toLowerCase() === form_username.toLowerCase())) {
-                console.log("no such user", { form_username });
+                logger.info("no such user {form_username}", { form_username });
                 return { error: "no such user" };
             }
             const user = users[0];
@@ -112,7 +114,7 @@ export class SessionKit {
                 hash: user.hashed_password,
             });
             if (!password_is_correct) {
-                console.log("incorrect password", { form_username });
+                logger.info("incorrect password provided by {form_username}", { form_username });
                 return { error: "incorrect password" };
             }
             // Create a new session in the database
@@ -133,7 +135,7 @@ export class SessionKit {
                 await this.#sessions_query.delete_by_ids_and_user_id([session.id], session.user_id);
             }
             else {
-                console.log("no session to log out");
+                logger.info("no session to log out");
             }
             this.#clear_session_cookie(cookies);
         };

@@ -1,13 +1,16 @@
 <script lang="ts">
 	import type { PageProps } from "./$types";
 	import { invalidateAll } from "$app/navigation";
+	import { getLogger } from "@logtape/logtape";
+
+	const logger = getLogger(["demo"]);
 
 	let { data }: PageProps = $props();
 
 	async function remove_session(id: number) {
 		const obj = await (await fetch(`/api/sessions/${id}`, { method: "DELETE" })).json();
 		if (!obj.success) {
-			console.log(`DELETE /api/sessions/${id} returned`, obj);
+			logger.warn(`DELETE /api/sessions/${id} returned {obj}`, { obj });
 		}
 		await invalidateAll();
 	}

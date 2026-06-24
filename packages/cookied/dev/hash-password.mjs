@@ -23,4 +23,4 @@ const key = await argon2id({
 	outputType: "encoded",
 });
 
-console.log(key);
+process.stdout.write(key);

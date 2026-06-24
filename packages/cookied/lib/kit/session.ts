@@ -5,6 +5,9 @@ import { type MinimizedDatabaseSession, SessionsQuery } from "../db/session.js";
 import type { Config } from "../db/config.js";
 import { BadSessionCookieError, SessionCookie } from "../session.js";
 import { sql, throw_if_gt1 } from "../util.js";
+import { getLogger } from "@logtape/logtape";
+
+const logger = getLogger(["cookied"]);
 
 export type CookieOptions = {
 	// Name for the session cookie, e.g. "s" or some other name unique for the domain
@@ -79,7 +82,7 @@ export class SessionKit {
 				cookie = SessionCookie.parse(s_cookie);
 			} catch (e) {
 				if (e instanceof BadSessionCookieError) {
-					console.debug("session cookie failed to parse, clearing it", { s_cookie });
+					logger.warn("session cookie {s_cookie} failed to parse, clearing it", { s_cookie });
 					this.#clear_session_cookie(cookies);
 				} else {
 					throw e;
@@ -90,7 +93,7 @@ export class SessionKit {
 			}
 			const session = await this.#sessions_query.validate(cookie);
 			if (!session) {
-				console.debug("session cookie references session not in database, clearing cookie", { cookie });
+				logger.warn("session cookie {cookie} references session not in database, clearing cookie", { cookie });
 				cookie = null;
 				this.#clear_session_cookie(cookies);
 				return resolve(event);
@@ -114,12 +117,12 @@ export class SessionKit {
 
 			// Bail out early if possible, since users.sql doesn't allow empty usernames
 			if (!form_username) {
-				console.log("empty username", { form_username });
+				logger.info("empty username {form_username}", { form_username });
 				return { error: "empty username" };
 			}
 
 			if (!form_password) {
-				console.log("empty password", { form_username });
+				logger.info("empty password provided by {form_username}", { form_username });
 				return { error: "empty password" };
 			}
 
@@ -132,7 +135,7 @@ export class SessionKit {
 			);
 			// Sanity-check the row from the database: ensure username match
 			if (!(users.length && users[0].username.toLowerCase() === form_username.toLowerCase())) {
-				console.log("no such user", { form_username });
+				logger.info("no such user {form_username}", { form_username });
 				return { error: "no such user" };
 			}
 			const user = users[0];
@@ -142,7 +145,7 @@ export class SessionKit {
 				hash: user.hashed_password,
 			});
 			if (!password_is_correct) {
-				console.log("incorrect password", { form_username });
+				logger.info("incorrect password provided by {form_username}", { form_username });
 				return { error: "incorrect password" };
 			}
 
@@ -166,7 +169,7 @@ export class SessionKit {
 				// Remove the session from the database
 				await this.#sessions_query.delete_by_ids_and_user_id([session.id], session.user_id);
 			} else {
-				console.log("no session to log out");
+				logger.info("no session to log out");
 			}
 
 			this.#clear_session_cookie(cookies);

@@ -1,5 +1,8 @@
 import { inspect } from "node:util";
 import postgres from "postgres";
+import { getLogger } from "@logtape/logtape";
+
+const logger = getLogger(["cookied"]);
 
 export function env(name: string): string {
 	if (Object.hasOwn(process.env, name)) {
@@ -77,7 +80,7 @@ export function get_connection_parameters(database_uri: string) {
 }
 
 export function dbg<T>(obj: T): T {
-	console.log(obj);
+	logger.debug("{obj}", { obj });
 	return obj;
 }
 
