@@ -1,0 +1,81 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"env": {
+		"browser": true,
+		"node": true,
+		"es2022": true
+	},
+	"categories": {
+		"correctness": "error",
+		"suspicious": "warn",
+		"perf": "warn",
+		"pedantic": "off",
+		"restriction": "off",
+		"style": "off",
+		"nursery": "off"
+	},
+	"plugins": [
+		"eslint",
+		"typescript",
+		"unicorn",
+		"oxc",
+		"import",
+		"promise",
+		"node",
+		"vitest"
+	],
+	"ignorePatterns": [
+		".svelte-kit/**",
+		"build/**",
+		"dist/**",
+		"coverage/**",
+		"node_modules/**"
+	],
+	"rules": {
+		"no-console": "warn",
+		"no-debugger": "error",
+		// SvelteKit has things like `import './layout.css';`
+		"no-unassigned-import": "off",
+
+		//"eslint/no-unused-vars": "off",
+		"typescript/no-unused-vars": [
+			"error",
+			{
+				"argsIgnorePattern": "^_",
+				"varsIgnorePattern": "^_"
+			}
+		],
+
+		"typescript/no-explicit-any": "warn",
+		"typescript/consistent-type-imports": "error",
+
+		"unicorn/prefer-node-protocol": "error",
+		//"unicorn/no-null": "off"
+	},
+	"overrides": [
+		{
+			"files": [
+				"**/*.test.{js,ts}",
+				"**/*.spec.{js,ts}",
+				"src/**/*.svelte.{js,ts}"
+			],
+			"env": {
+				"vitest": true
+			},
+			"rules": {
+				"no-console": "off"
+			}
+		},
+		{
+			"files": [
+				"vite.config.ts",
+				"svelte.config.js",
+				"eslint.config.js",
+				"playwright.config.ts"
+			],
+			"rules": {
+				"no-console": "off"
+			}
+		}
+	]
+}
