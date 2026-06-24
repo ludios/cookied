@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@logtape/lint':
+        specifier: 2.2.0
+        version: 2.2.0(eslint@10.5.0)
       '@types/node':
         specifier: ^26.0.0
         version: 26.0.0
@@ -335,6 +338,14 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@logtape/lint@2.2.0':
+    resolution: {integrity: sha512-n6t0wsRYAW2uPTYwQLkekfe2aXViJuMjg/1UhOSB6mjHTMbo4KaC/bGQ6chF0NuQIaC9tSkwswbhkR0uXWrERA==}
+    peerDependencies:
+      eslint: '>=8.0.0'
+    peerDependenciesMeta:
+      eslint:
+        optional: true
 
   '@mapbox/node-pre-gyp@2.0.3':
     resolution: {integrity: sha512-uwPAhccfFJlsfCxMYTwOdVfOz3xqyj8xYL3zJj8f0pb30tLohnnFPhLuqp4/qoEz8sNxe4SESZedcBojRefIzg==}
@@ -1895,6 +1906,10 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@logtape/lint@2.2.0(eslint@10.5.0)':
+    optionalDependencies:
+      eslint: 10.5.0
 
   '@mapbox/node-pre-gyp@2.0.3':
     dependencies:
