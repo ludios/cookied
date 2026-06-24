@@ -4,7 +4,7 @@
 	"version": "0.2.3",
 	"scripts": {
 		"build": "./node_modules/.bin/tsc",
-		"test": "../../dev/test-schema && ./node_modules/.bin/ava && ./node_modules/.bin/tsc --target esnext --moduleResolution node --noEmit tests/*.ts && ./node_modules/.bin/eslint .",
+		"test": "../../dev/test-schema && ./node_modules/.bin/vitest run && ./node_modules/.bin/tsc --target esnext --moduleResolution node --noEmit tests/*.ts && ./node_modules/.bin/eslint .",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write ."
 	},
@@ -29,17 +29,9 @@
 		"@logtape/logtape": "^2.2.1"
 	},
 	"devDependencies": {
-		"ava": "^8.0.1",
+		"vitest": "4.1.9",
 		"eslint": "^10.5.0",
 		"tsx": "^4.22.4",
 		"typescript": "^6.0.3"
-	},
-	"ava": {
-		"extensions": {
-			"ts": "commonjs"
-		},
-		"nodeArguments": [
-			"--import=tsx"
-		]
 	}
 }
