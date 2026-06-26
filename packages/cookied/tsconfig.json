@@ -8,6 +8,7 @@
 		"moduleResolution": "node16",
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
+		"rootDir": ".",
 		"outDir": "dist",
 		// Generate d.ts files
 		"declaration": true,
