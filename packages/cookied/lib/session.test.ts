@@ -4,7 +4,8 @@ import { BadSessionCookieError, SessionCookie } from "../lib/session.js";
 
 describe("new SessionCookie", () => {
 	it("doesn't throw when given a valid ID and Buffer", () => {
-		const _ = new SessionCookie(1, Buffer.alloc(16));
+		// oxlint-disable-next-line no-new
+		new SessionCookie(1, Buffer.alloc(16));
 		expect.assertions(0);
 	});
 
