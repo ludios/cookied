@@ -1,5 +1,5 @@
 import type { RequestHandler } from './$types';
-import { SessionsQuery } from 'cookied/lib/db/session';
+import { SessionsQuery } from 'cookied/lib/db/session.js';
 import { json } from '@sveltejs/kit';
 import { database_config } from '../../../../util';
 
