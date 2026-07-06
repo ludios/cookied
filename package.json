@@ -5,8 +5,8 @@
 	"private": true,
 	"type": "module",
 	"devDependencies": {
-		"@types/node": "^26.0.0",
-		"oxlint": "^1.71.0",
-		"@logtape/lint": "2.2.0"
+		"@logtape/lint": "2.2.0",
+		"@types/node": "^26.1.0",
+		"oxlint": "^1.72.0"
 	}
 }
