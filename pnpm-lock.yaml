@@ -9,7 +9,7 @@ importers:
   .:
     devDependencies:
       '@logtape/lint':
-        specifier: 2.2.3
+        specifier: ^2.2.3
         version: 2.2.3(eslint@10.6.0)
       '@types/node':
         specifier: ^26.1.0
