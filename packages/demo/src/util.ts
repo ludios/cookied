@@ -1,6 +1,6 @@
-import { default_sql, env } from "cookied/lib/util";
-import type { Config } from "cookied/lib/db/config";
-import type { CookieOptions } from "cookied/lib/kit/session";
+import { default_sql, env } from "cookied/lib/util.js";
+import type { Config } from "cookied/lib/db/config.js";
+import type { CookieOptions } from "cookied/lib/kit/session.js";
 
 export function cookie_options_from_env(): CookieOptions {
 	return {

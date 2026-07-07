@@ -4,7 +4,7 @@
 	"version": "2.0.0",
 	"scripts": {
 		"build": "./node_modules/.bin/tsc",
-		"test": "../../dev/test-schema && ./node_modules/.bin/vitest run && ./node_modules/.bin/tsc --target esnext --moduleResolution node --noEmit tests/*.ts && ./node_modules/.bin/eslint .",
+		"test": "../../dev/test-schema && ./node_modules/.bin/vitest run && ./node_modules/.bin/tsc --noEmit && ../../node_modules/.bin/oxlint .",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write ."
 	},
@@ -37,7 +37,6 @@
 		}
 	},
 	"devDependencies": {
-		"eslint": "^10.6.0",
 		"tsx": "^4.23.0",
 		"typescript": "^6.0.3",
 		"vitest": "4.1.9"
