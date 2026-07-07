@@ -28,6 +28,14 @@
 		"@logtape/logtape": "^2.2.1",
 		"@sveltejs/kit": "^2.0.5"
 	},
+	"peerDependenciesMeta": {
+		"@logtape/logtape": {
+			"optional": true
+		},
+		"@sveltejs/kit": {
+			"optional": true
+		}
+	},
 	"devDependencies": {
 		"eslint": "^10.6.0",
 		"tsx": "^4.23.0",
