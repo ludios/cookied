@@ -1,7 +1,8 @@
 import crypto from "node:crypto";
+import type { Sql } from "postgres";
 import type { SessionCookie } from "../session.js";
 import type { Config, Identifiers } from "./config.js";
-import { get_one_row, sql, throw_if_gt1 } from "../util.js";
+import { get_one_row, throw_if_gt1 } from "../util.js";
 
 export type MinimizedDatabaseSession = {
 	id: number;
@@ -17,38 +18,40 @@ export type DatabaseSession = MinimizedDatabaseSession & {
 
 export class SessionsQuery {
 	#ids: Identifiers;
+	#sql: Sql;
 
 	constructor(config: Config) {
 		this.#ids = config.identifiers;
+		this.#sql = config.sql;
 	}
 
 	async find_by_ids(session_ids: [number]): Promise<ReadonlyArray<DatabaseSession>> {
-		return await sql`
+		return await this.#sql`
 			SELECT id, user_id, username, birth_time, hashed_secret, user_agent_seen_first
-			FROM ${sql(this.#ids.sessions_view)} WHERE id = ANY(${session_ids})
+			FROM ${this.#sql(this.#ids.sessions_view)} WHERE id = ANY(${session_ids})
 		`;
 	}
 
 	async find_minimized_by_user_id(user_id: number): Promise<ReadonlyArray<MinimizedDatabaseSession>> {
-		return await sql`
+		return await this.#sql`
 			SELECT id, user_id, username, birth_time, user_agent_seen_first
-			FROM ${sql(this.#ids.sessions_view)} WHERE user_id = ${user_id}
+			FROM ${this.#sql(this.#ids.sessions_view)} WHERE user_id = ${user_id}
 		`;
 	}
 
 	async create(user_id: number, user_agent: string): Promise<{ id: number; secret: Buffer }> {
 		return get_one_row(
-			(await sql`
+			(await this.#sql`
 				SELECT id, secret
-				FROM ${sql(this.#ids.new_session)}(${user_id}, ${user_agent})
+				FROM ${this.#sql(this.#ids.new_session)}(${user_id}, ${user_agent})
 				AS (id bigint, secret bytea);
 			`) satisfies Array<{ id: number; secret: Buffer }>,
 		);
 	}
 
 	async delete_by_ids_and_user_id(session_ids: [number], user_id: number): Promise<void> {
-		await sql`
-			DELETE FROM ${sql(this.#ids.sessions)}
+		await this.#sql`
+			DELETE FROM ${this.#sql(this.#ids.sessions)}
 			WHERE id = ANY(${session_ids})
 			AND user_id = ${user_id}
 		`;

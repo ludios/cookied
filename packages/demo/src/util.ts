@@ -1,4 +1,4 @@
-import { env } from "cookied/lib/util";
+import { default_sql, env } from "cookied/lib/util";
 import type { Config } from "cookied/lib/db/config";
 import type { CookieOptions } from "cookied/lib/kit/session";
 
@@ -18,4 +18,5 @@ export const database_config: Config = {
 		sessions_view: `${schema}.sessions_view`,
 		new_session: `${schema}.new_session`,
 	},
+	sql: default_sql(),
 };

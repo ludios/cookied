@@ -2,7 +2,7 @@ import { A } from "ayy";
 import { argon2Verify } from "hash-wasm";
 import { SessionsQuery } from "../db/session.js";
 import { BadSessionCookieError, SessionCookie } from "../session.js";
-import { sql, throw_if_gt1 } from "../util.js";
+import { throw_if_gt1 } from "../util.js";
 import { getLogger } from "@logtape/logtape";
 const logger = getLogger(["cookied"]);
 export class SessionKit {
@@ -98,6 +98,7 @@ export class SessionKit {
                 logger.info("empty password provided by {form_username}", { form_username });
                 return { error: "empty password" };
             }
+            const sql = this.#database_config.sql;
             const users = throw_if_gt1((await sql `
 					SELECT id, username, hashed_password
 					FROM ${sql(this.#database_config.identifiers.users)}

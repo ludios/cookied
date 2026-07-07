@@ -1,5 +1,5 @@
 import { inspect } from "node:util";
-import postgres from "postgres";
+import postgres, { type Sql } from "postgres";
 import { getLogger } from "@logtape/logtape";
 
 const logger = getLogger(["cookied"]);
@@ -84,4 +84,9 @@ export function dbg<T>(obj: T): T {
 	return obj;
 }
 
-export const sql = postgres(get_connection_parameters(env("DATABASE_URI")));
+// Convenience factory for applications: create a postgres.js pool from the
+// DATABASE_URI environment variable. Called explicitly so that merely
+// importing this module does nothing when DATABASE_URI is unset.
+export function default_sql(): Sql {
+	return postgres(get_connection_parameters(env("DATABASE_URI")));
+}

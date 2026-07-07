@@ -1,7 +1,7 @@
 {
 	"name": "cookied",
 	"description": "PostgreSQL-backed authentication for Node.js-based web applications",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"scripts": {
 		"build": "./node_modules/.bin/tsc",
 		"test": "../../dev/test-schema && ./node_modules/.bin/vitest run && ./node_modules/.bin/tsc --target esnext --moduleResolution node --noEmit tests/*.ts && ./node_modules/.bin/eslint .",

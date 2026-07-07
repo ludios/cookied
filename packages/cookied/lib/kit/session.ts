@@ -4,7 +4,7 @@ import { argon2Verify } from "hash-wasm";
 import { type MinimizedDatabaseSession, SessionsQuery } from "../db/session.js";
 import type { Config } from "../db/config.js";
 import { BadSessionCookieError, SessionCookie } from "../session.js";
-import { sql, throw_if_gt1 } from "../util.js";
+import { throw_if_gt1 } from "../util.js";
 import { getLogger } from "@logtape/logtape";
 
 const logger = getLogger(["cookied"]);
@@ -126,6 +126,7 @@ export class SessionKit {
 				return { error: "empty password" };
 			}
 
+			const sql = this.#database_config.sql;
 			const users = throw_if_gt1(
 				(await sql`
 					SELECT id, username, hashed_password

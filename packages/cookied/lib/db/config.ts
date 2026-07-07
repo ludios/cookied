@@ -1,3 +1,5 @@
+import type { Sql } from "postgres";
+
 export type Identifiers = {
 	// e.g. "cookied.users"
 	users: string;
@@ -12,4 +14,6 @@ export type Identifiers = {
 export type Config = {
 	// Database identifiers for tables, views, and functions
 	identifiers: Identifiers;
+	// postgres.js connection pool to run queries on
+	sql: Sql;
 }

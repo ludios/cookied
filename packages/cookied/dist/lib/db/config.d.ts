@@ -1,3 +1,4 @@
+import type { Sql } from "postgres";
 export type Identifiers = {
     users: string;
     sessions: string;
@@ -6,4 +7,5 @@ export type Identifiers = {
 };
 export type Config = {
     identifiers: Identifiers;
+    sql: Sql;
 };

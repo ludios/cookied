@@ -74,5 +74,10 @@ export function dbg(obj) {
     logger.debug("{obj}", { obj });
     return obj;
 }
-export const sql = postgres(get_connection_parameters(env("DATABASE_URI")));
+// Convenience factory for applications: create a postgres.js pool from the
+// DATABASE_URI environment variable. Called explicitly so that merely
+// importing this module does nothing when DATABASE_URI is unset.
+export function default_sql() {
+    return postgres(get_connection_parameters(env("DATABASE_URI")));
+}
 //# sourceMappingURL=util.js.map
