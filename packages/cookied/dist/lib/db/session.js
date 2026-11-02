@@ -49,16 +49,11 @@ export class SessionsQuery {
         if (!db_session) {
             return null;
         }
-        if (!crypto.timingSafeEqual(session.hashedSecret(), db_session.hashed_secret)) {
+        const { hashed_secret, ...minimized } = db_session;
+        if (!crypto.timingSafeEqual(session.hashedSecret(), hashed_secret)) {
             return null;
         }
-        return {
-            id: db_session.id,
-            user_id: db_session.user_id,
-            birth_time: db_session.birth_time,
-            user_agent_seen_first: db_session.user_agent_seen_first,
-            username: db_session.username,
-        };
+        return minimized;
     }
 }
 //# sourceMappingURL=session.js.map
