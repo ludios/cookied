@@ -4,7 +4,7 @@
 	"version": "3.0.0",
 	"scripts": {
 		"build": "./node_modules/.bin/tsc",
-		"test": "../../dev/test-schema && ./node_modules/.bin/vitest run && ./node_modules/.bin/tsc --noEmit && ../../node_modules/.bin/oxlint .",
+		"test": "./node_modules/.bin/vitest run --dir lib && ./node_modules/.bin/tsc --noEmit && ../../node_modules/.bin/oxlint .",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write ."
 	},
