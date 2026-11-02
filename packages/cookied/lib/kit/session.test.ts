@@ -55,11 +55,11 @@ function start_database(): string {
 
 /**
  * @param cookies the cookies of the client that submits the form
- * @param username what the client typed as the username
+ * @param username what the client typed as the username, or a file that it put in its place
  * @param password what the client typed as the password
  * @returns a request event with the login form that the client submits
  */
-function login_event(cookies: FakeCookies, username: string, password: string): RequestEvent {
+function login_event(cookies: FakeCookies, username: string | File, password: string): RequestEvent {
 	const body = new FormData();
 	body.set("username", username);
 	body.set("password", password);
@@ -182,6 +182,11 @@ describe("SessionKit against PostgreSQL", () => {
 		expect(await login(login_event(cookies, "alice", "wrong"))).toEqual({ error: "incorrect password" });
 		expect(await login(login_event(cookies, "bob", "pw"))).toEqual({ error: "no such user" });
 		expect(cookies.getAll()).toEqual([]);
+	});
+
+	it("takes a username field that holds a file as empty", async () => {
+		const file = new File(["alice"], "username.txt");
+		expect(await kit.make_login_action(() => false)(login_event(new FakeCookies(), file, "pw"))).toEqual({ error: "empty username" });
 	});
 
 	it("spends as long on an unknown user as on checking a password against the decoy hash", async () => {

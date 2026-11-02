@@ -36,6 +36,16 @@ type Handle = (input: {
 	resolve: (event: RequestEvent) => Response | Promise<Response>;
 }) => Promise<Response>;
 
+/**
+ * @param form_data a submitted form
+ * @param name      the name of one of its fields
+ * @returns the text in the field, or "" if the form has no such field or the field holds a file
+ */
+function text_field(form_data: FormData, name: string): string {
+	const value = form_data.get(name);
+	return typeof value === "string" ? value : "";
+}
+
 export class SessionKit {
 	#database_config: Config;
 	#cookie_options: CookieOptions;
@@ -122,8 +132,8 @@ export class SessionKit {
 			}
 
 			const form_data = await event.request.formData();
-			const form_username = form_data.get("username") as string;
-			const form_password = form_data.get("password") as string;
+			const form_username = text_field(form_data, "username");
+			const form_password = text_field(form_data, "password");
 
 			// Bail out early if possible, since users.sql doesn't allow empty usernames
 			if (!form_username) {

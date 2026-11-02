@@ -6,6 +6,15 @@ import { BadSessionCookieError, SessionCookie } from "../session.js";
 import { int8_to_number, throw_if_gt1 } from "../util.js";
 import { getLogger } from "@logtape/logtape";
 const logger = getLogger(["cookied"]);
+/**
+ * @param form_data a submitted form
+ * @param name      the name of one of its fields
+ * @returns the text in the field, or "" if the form has no such field or the field holds a file
+ */
+function text_field(form_data, name) {
+    const value = form_data.get(name);
+    return typeof value === "string" ? value : "";
+}
 export class SessionKit {
     #database_config;
     #cookie_options;
@@ -88,8 +97,8 @@ export class SessionKit {
                 return { error: "already logged in" };
             }
             const form_data = await event.request.formData();
-            const form_username = form_data.get("username");
-            const form_password = form_data.get("password");
+            const form_username = text_field(form_data, "username");
+            const form_password = text_field(form_data, "password");
             // Bail out early if possible, since users.sql doesn't allow empty usernames
             if (!form_username) {
                 logger.info("empty username {form_username}", { form_username });
