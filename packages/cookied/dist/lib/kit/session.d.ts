@@ -14,17 +14,21 @@ type Handle = (input: {
     event: RequestEvent;
     resolve: (event: RequestEvent) => Response | Promise<Response>;
 }) => Promise<Response>;
+/**
+ * What a login action answers: that the client is now logged in, or why not. One error says
+ * both that no user has the username and that the password is wrong, so that the answer
+ * doesn't tell whether the user exists.
+ */
+export type LoginResult = {
+    success: true;
+} | {
+    error: "already logged in" | "empty username" | "empty password" | "incorrect username or password";
+};
 export declare class SessionKit {
     #private;
     constructor(database_config: Config, cookie_options: CookieOptions);
     make_parse_session_cookie_hook(got_session: GotSessionCallback): Handle;
-    make_login_action(already_logged_in: (event: RequestEvent) => boolean): (event: RequestEvent) => Promise<{
-        error: string;
-        success?: undefined;
-    } | {
-        success: boolean;
-        error?: undefined;
-    }>;
+    make_login_action(already_logged_in: (event: RequestEvent) => boolean): (event: RequestEvent) => Promise<LoginResult>;
     make_logout_action(): ({ cookies, locals }: {
         cookies: Cookies;
         locals: unknown;

@@ -52,6 +52,15 @@ function text_field(form_data: FormData, name: string): string {
 	return typeof value === "string" ? value : "";
 }
 
+/**
+ * What a login action answers: that the client is now logged in, or why not. One error says
+ * both that no user has the username and that the password is wrong, so that the answer
+ * doesn't tell whether the user exists.
+ */
+export type LoginResult =
+	| { success: true }
+	| { error: "already logged in" | "empty username" | "empty password" | "incorrect username or password" };
+
 export class SessionKit {
 	#database_config: Config;
 	#cookie_options: CookieOptions;
@@ -132,7 +141,7 @@ export class SessionKit {
 	}
 
 	make_login_action(already_logged_in: (event: RequestEvent) => boolean) {
-		return async (event: RequestEvent) => {
+		return async (event: RequestEvent): Promise<LoginResult> => {
 			if (already_logged_in(event)) {
 				return { error: "already logged in" };
 			}
