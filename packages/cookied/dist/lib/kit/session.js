@@ -72,7 +72,6 @@ export class SessionKit {
             const session = await this.#sessions_query.validate(cookie);
             if (!session) {
                 logger.warn("session cookie {cookie} references session not in database, clearing cookie", { cookie });
-                cookie = null;
                 this.#clear_session_cookie(cookies);
                 return resolve(event);
             }
