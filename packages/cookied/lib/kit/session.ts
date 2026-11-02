@@ -37,6 +37,12 @@ type Handle = (input: {
 }) => Promise<Response>;
 
 /**
+ * The usernames that users.sql's `username` domain could allow: 1 to 31 ASCII letters, digits,
+ * and dashes. The domain forbids some of these too, such as one that is only digits.
+ */
+const POSSIBLE_USERNAME = /^[-a-zA-Z0-9]{1,31}$/;
+
+/**
  * @param form_data a submitted form
  * @param name      the name of one of its fields
  * @returns the text in the field, or "" if the form has no such field or the field holds a file
@@ -144,6 +150,13 @@ export class SessionKit {
 			if (!form_password) {
 				logger.info("empty password provided by {form_username}", { form_username });
 				return { error: "empty password" };
+			}
+
+			// No user has such a username, so the answer can come at once without telling anything.
+			// It also keeps out what PostgreSQL would reject, such as a NUL character.
+			if (!POSSIBLE_USERNAME.test(form_username)) {
+				logger.info("impossible username {form_username}", { form_username });
+				return { error: "incorrect username or password" };
 			}
 
 			const sql = this.#database_config.sql;

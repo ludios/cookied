@@ -184,6 +184,13 @@ describe("SessionKit against PostgreSQL", () => {
 		expect(cookies.getAll()).toEqual([]);
 	});
 
+	it("refuses a username that users.sql can't hold, also one with a NUL, which PostgreSQL would reject", async () => {
+		const login = kit.make_login_action(() => false);
+		for (const username of ["al\u0000ice", "a".repeat(32), "älice"]) {
+			expect(await login(login_event(new FakeCookies(), username, "pw"))).toEqual({ error: "incorrect username or password" });
+		}
+	});
+
 	it("takes a username field that holds a file as empty", async () => {
 		const file = new File(["alice"], "username.txt");
 		expect(await kit.make_login_action(() => false)(login_event(new FakeCookies(), file, "pw"))).toEqual({ error: "empty username" });
