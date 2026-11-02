@@ -297,16 +297,21 @@ describe("SessionKit against PostgreSQL", () => {
 		expect(cookies.get(cookie_name)).toBeUndefined();
 	});
 
-	it("admits into users.hashed_password an algorithm, version, and costs that verify_password parses, but no cost of 0", async () => {
+	it("admits into users.hashed_password an algorithm, version, and costs that verify_password parses, but no cost of 0 or of more than 10 digits", async () => {
 		// [hash, whether verify_password parses it, whether users.sql admits it]
 		const cases: Array<[string, boolean, boolean]> = [
 			["$argon2id$v=19$m=16,t=2,p=1$AAAAAAAAAAA$AAAAAA",            true,  true],
 			["$argon2i$v=19$m=16,t=2,p=1$AAAAAAAAAAA$AAAAAA",             true,  true],
 			["$argon2d$v=19$m=16,t=2,p=1$AAAAAAAAAAA$AAAAAA",             true,  true],
-			// node:crypto refuses a cost of 0, but only after verify_password parses it
+			// node:crypto refuses a cost of 0 or above 2^32 - 1, but only after verify_password
+			// parses it. 2^32 - 1 has 10 digits, so the CHECK refuses costs of more than 10 digits.
 			["$argon2id$v=19$m=0,t=2,p=1$AAAAAAAAAAA$AAAAAA",             true,  false],
 			["$argon2id$v=19$m=16,t=0,p=1$AAAAAAAAAAA$AAAAAA",            true,  false],
 			["$argon2id$v=19$m=16,t=2,p=0$AAAAAAAAAAA$AAAAAA",            true,  false],
+			["$argon2id$v=19$m=9999999999,t=2,p=1$AAAAAAAAAAA$AAAAAA",    true,  true],
+			["$argon2id$v=19$m=10000000000,t=2,p=1$AAAAAAAAAAA$AAAAAA",   true,  false],
+			// A cost that a double can't hold exactly
+			["$argon2id$v=19$m=9007199254740993,t=2,p=1$AAAAAAAAAAA$AAAAAA", false, false],
 			["$argon2$v=19$m=16,t=2,p=1$AAAAAAAAAAA$AAAAAA",              false, false],
 			["$argon2id$v=16$m=16,t=2,p=1$AAAAAAAAAAA$AAAAAA",            false, false],
 			["$argon2id$m=16,t=2,p=1$AAAAAAAAAAA$AAAAAA",                 false, false],

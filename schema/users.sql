@@ -38,7 +38,7 @@ CREATE TABLE users (
 	username         username     NOT NULL,
 	-- An argon2 PHC string
 	hashed_password  text         NOT NULL CHECK (hashed_password ~ (
-		'\A\$argon2(?:d|i|id)\$v=19\$m=[1-9][0-9]*,t=[1-9][0-9]*,p=[1-9][0-9]*'
+		'\A\$argon2(?:d|i|id)\$v=19\$m=[1-9][0-9]{0,9},t=[1-9][0-9]{0,9},p=[1-9][0-9]{0,9}'
 		'\$(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{4}|[A-Za-z0-9+/][AQgw]|[A-Za-z0-9+/]{2}[AEIMQUYcgkosw048])'
 		'\$(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{4}|[A-Za-z0-9+/][AQgw]|[A-Za-z0-9+/]{2}[AEIMQUYcgkosw048])\Z'
 	)),
