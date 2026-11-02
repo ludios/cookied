@@ -23,12 +23,16 @@ export function get_one_row(rows) {
     return rows[0];
 }
 /**
- * @param int8 the value of a bigint column
+ * @param int8 the value of a PostgreSQL int8 column
  * @returns the same integer as a number
+ * @throws AssertionError if `int8` is not an integer within ±Number.MAX_SAFE_INTEGER;
+ *   a string must consist of decimal digits with an optional leading "-"
  */
 export function int8_to_number(int8) {
+    // Number() alone would also accept e.g. null, "", "0x1F", "1e3" and "1.000"
+    const is_int8 = typeof int8 === "string" ? /^-?[0-9]+$/.test(int8) : typeof int8 === "number" || typeof int8 === "bigint";
     const n = Number(int8);
-    A(Number.isSafeInteger(n), () => `expected a bigint value that is a safe integer, got ${inspect(int8)}`);
+    A(is_int8 && Number.isSafeInteger(n), () => `expected the value of a PostgreSQL int8 column within ±Number.MAX_SAFE_INTEGER, got ${inspect(int8)}`);
     return n;
 }
 export function dbg(obj) {

@@ -28,18 +28,24 @@ export function get_one_row<T>(rows: ReadonlyArray<T>): T {
 	return rows[0];
 }
 
-// The value of a bigint column, as a postgres.js pool returns it: decimal text by
-// default, or a number or a BigInt if the application has configured the pool to
-// parse bigint columns that way.
+/**
+ * The value of a PostgreSQL int8 column (also called bigint; 8 bytes, not 8 bits), as a
+ * postgres.js pool returns it: decimal text by default, or a number or a JavaScript
+ * BigInt if the application has configured the pool to parse int8 columns that way.
+ */
 export type Int8 = string | number | bigint;
 
 /**
- * @param int8 the value of a bigint column
+ * @param int8 the value of a PostgreSQL int8 column
  * @returns the same integer as a number
+ * @throws AssertionError if `int8` is not an integer within ±Number.MAX_SAFE_INTEGER;
+ *   a string must consist of decimal digits with an optional leading "-"
  */
 export function int8_to_number(int8: Int8): number {
+	// Number() alone would also accept e.g. null, "", "0x1F", "1e3" and "1.000"
+	const is_int8 = typeof int8 === "string" ? /^-?[0-9]+$/.test(int8) : typeof int8 === "number" || typeof int8 === "bigint";
 	const n = Number(int8);
-	A(Number.isSafeInteger(n), () => `expected a bigint value that is a safe integer, got ${inspect(int8)}`);
+	A(is_int8 && Number.isSafeInteger(n), () => `expected the value of a PostgreSQL int8 column within ±Number.MAX_SAFE_INTEGER, got ${inspect(int8)}`);
 	return n;
 }
 

@@ -13,6 +13,14 @@ describe("int8_to_number", () => {
         expect(() => int8_to_number("9007199254740992")).toThrow(AssertionError);
         expect(() => int8_to_number(2n ** 53n)).toThrow(AssertionError);
         expect(() => int8_to_number("1.5")).toThrow(AssertionError);
+        expect(() => int8_to_number("9007199254740991.4")).toThrow(AssertionError);
+        expect(() => int8_to_number(1.5)).toThrow(AssertionError);
+    });
+    it("throws on a value that is not the text of a decimal integer", () => {
+        for (const value of ["", " ", " 1", "1 ", "+1", "0x1F", "1e3", "1.000", "one"]) {
+            expect(() => int8_to_number(value)).toThrow(AssertionError);
+        }
+        expect(() => int8_to_number(null)).toThrow(AssertionError);
     });
 });
 //# sourceMappingURL=util.test.js.map
