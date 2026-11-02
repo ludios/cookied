@@ -3,10 +3,10 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { configure, getConsoleSink, reset } from "@logtape/logtape";
 import { argon2id } from "hash-wasm";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { SessionsQuery } from "../db/session.js";
 import { SessionCookie } from "../session.js";
-import { default_sql } from "../util.js";
+import { default_sql, int8_to_number } from "../util.js";
 import { SessionKit } from "./session.js";
 const schema_dir = fileURLToPath(new URL("../../../../schema/", import.meta.url));
 const cookie_name = "s";
@@ -86,8 +86,12 @@ describe("SessionKit against PostgreSQL", () => {
         const [user] = await sql `
 			INSERT INTO cookied.users (username, hashed_password) VALUES ('Alice', ${hashed_password}) RETURNING id
 		`;
-        user_id = Number(user.id);
+        user_id = int8_to_number(user.id);
     }, 30_000);
+    // So that no test depends on the sessions that another test left behind
+    beforeEach(async () => {
+        await sql `DELETE FROM cookied.sessions WHERE user_id = ${user_id}`;
+    });
     afterAll(async () => {
         await sql?.end();
         vi.unstubAllEnvs();
@@ -117,7 +121,6 @@ describe("SessionKit against PostgreSQL", () => {
         expect(id).toBeTypeOf("number");
         expect(await sessions.find_by_ids([id])).toMatchObject([{ id, user_id }]);
         expect(await sessions.find_minimized_by_user_id(user_id)).toMatchObject([{ id, user_id }]);
-        await sessions.delete_by_ids_and_user_id([id], user_id);
     });
     it("logs no secret of a session cookie, also from cookies that it rejects", async () => {
         const cookies = new FakeCookies();
