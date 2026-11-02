@@ -18,15 +18,16 @@ export type DatabaseSession = MinimizedDatabaseSession & {
 	hashed_secret: Buffer;
 };
 
-// A row of type `T`, as a postgres.js pool returns it from a query on sessions_view
+// `T` as a postgres.js pool returns it from a query on sessions_view, except that
+// `id` and `user_id` are each an Int8 instead of a number
 type SessionRow<T> = Omit<T, "id" | "user_id"> & { id: Int8; user_id: Int8 };
 
 /**
  * @param row a row as a postgres.js pool returns it from a query on sessions_view
- * @returns the same row, with `id` and `user_id` as numbers
+ * @returns the same row, with `id` and `user_id` converted to numbers
  */
-function with_number_ids<T extends MinimizedDatabaseSession>(row: SessionRow<T>): T {
-	return { ...row, id: int8_to_number(row.id), user_id: int8_to_number(row.user_id) } as T;
+function with_number_ids<R extends { id: Int8; user_id: Int8 }>(row: R): Omit<R, "id" | "user_id"> & { id: number; user_id: number } {
+	return { ...row, id: int8_to_number(row.id), user_id: int8_to_number(row.user_id) };
 }
 
 export class SessionsQuery {
@@ -43,7 +44,7 @@ export class SessionsQuery {
 			SELECT id, user_id, username, birth_time, hashed_secret, user_agent_seen_first
 			FROM ${this.#sql(this.#ids.sessions_view)} WHERE id = ANY(${session_ids})
 		`;
-		return rows.map((row) => with_number_ids<DatabaseSession>(row));
+		return rows.map(with_number_ids);
 	}
 
 	async find_minimized_by_user_id(user_id: number): Promise<ReadonlyArray<MinimizedDatabaseSession>> {
@@ -51,7 +52,7 @@ export class SessionsQuery {
 			SELECT id, user_id, username, birth_time, user_agent_seen_first
 			FROM ${this.#sql(this.#ids.sessions_view)} WHERE user_id = ${user_id}
 		`;
-		return rows.map((row) => with_number_ids<MinimizedDatabaseSession>(row));
+		return rows.map(with_number_ids);
 	}
 
 	async create(user_id: number, user_agent: string): Promise<{ id: number; secret: Buffer }> {

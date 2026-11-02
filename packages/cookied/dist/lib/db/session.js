@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import { get_one_row, int8_to_number, throw_if_gt1 } from "../util.js";
 /**
  * @param row a row as a postgres.js pool returns it from a query on sessions_view
- * @returns the same row, with `id` and `user_id` as numbers
+ * @returns the same row, with `id` and `user_id` converted to numbers
  */
 function with_number_ids(row) {
     return { ...row, id: int8_to_number(row.id), user_id: int8_to_number(row.user_id) };
@@ -20,14 +20,14 @@ export class SessionsQuery {
 			SELECT id, user_id, username, birth_time, hashed_secret, user_agent_seen_first
 			FROM ${this.#sql(this.#ids.sessions_view)} WHERE id = ANY(${session_ids})
 		`;
-        return rows.map((row) => with_number_ids(row));
+        return rows.map(with_number_ids);
     }
     async find_minimized_by_user_id(user_id) {
         const rows = await this.#sql `
 			SELECT id, user_id, username, birth_time, user_agent_seen_first
 			FROM ${this.#sql(this.#ids.sessions_view)} WHERE user_id = ${user_id}
 		`;
-        return rows.map((row) => with_number_ids(row));
+        return rows.map(with_number_ids);
     }
     async create(user_id, user_agent) {
         const row = get_one_row(await this.#sql `
