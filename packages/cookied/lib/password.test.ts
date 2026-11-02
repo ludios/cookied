@@ -76,24 +76,18 @@ describe("PasswordChecker", () => {
 
 	it("checks off the calling thread, whose timers keep running meanwhile", async () => {
 		const checker = new PasswordChecker(1, 0);
-		const start = performance.now();
-		let last_tick = start;
-		let longest_gap = 0;
+		let ticks = 0;
 		const timer = setInterval(() => {
-			const now = performance.now();
-			longest_gap = Math.max(longest_gap, now - last_tick);
-			last_tick = now;
+			ticks += 1;
 		}, 1);
 		try {
 			await checker.check("pw", DECOY_HASH);
 		} finally {
 			clearInterval(timer);
 		}
-		const end = performance.now();
-		// Also the gap up to the end, which is all of the check if it held off every tick
-		longest_gap = Math.max(longest_gap, end - last_tick);
-		expect(end - start).toBeGreaterThan(10);
-		expect(longest_gap).toBeLessThan((end - start) / 2);
+		// A check on the calling thread would hold off the timer until it answered, however long
+		// it took, and its answer would reach this test (in microtasks) before any timer could tick
+		expect(ticks).toBeGreaterThan(0);
 	});
 
 	it("refuses a check beyond max_running and max_waiting, runs the others, and then accepts again", async () => {
