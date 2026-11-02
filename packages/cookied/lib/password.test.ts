@@ -47,7 +47,8 @@ describe("verify_password", () => {
 describe("PasswordChecker", () => {
 	it("answers as hash-wasm does for a hash that hash-wasm made, which cookied before 6.0.0 wrote", async () => {
 		const checker = new PasswordChecker(1, 0);
-		// Code points, and surrogates without their pair, which both encode as U+FFFD in UTF-8
+		// Each unit is a code point or a lone surrogate. (node:crypto and hash-wasm both encode a lone
+		// surrogate in UTF-8 as U+FFFD.)
 		const unit = fc.oneof(fc.string({ unit: "binary", minLength: 1, maxLength: 1 }), fc.integer({ min: 0xd800, max: 0xdfff }).map((c) => String.fromCharCode(c)));
 		const inputs = fc.record({
 			password:  fc.string({ unit, minLength: 1 }),
@@ -57,7 +58,8 @@ describe("PasswordChecker", () => {
 			extra_m:   fc.integer({ min: 0, max: 40 }),
 			t:         fc.integer({ min: 1, max: 3 }),
 			salt:      fc.uint8Array({ minLength: 8, maxLength: 32 }),
-			tag_bytes: fc.integer({ min: 4, max: 64 }),
+			// Past 64 bytes, argon2 makes the tag with H', its hash of variable length
+			tag_bytes: fc.integer({ min: 4, max: 256 }),
 		});
 		await fc.assert(fc.asyncProperty(inputs, async ({ password, other, algorithm, p, extra_m, t, salt, tag_bytes }) => {
 			const hash = await HASH_WASM[algorithm]({
