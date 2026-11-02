@@ -29,9 +29,6 @@
 		"postgres": "^4.0.0"
 	},
 	"peerDependenciesMeta": {
-		"@logtape/logtape": {
-			"optional": true
-		},
 		"@sveltejs/kit": {
 			"optional": true
 		}
