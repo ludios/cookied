@@ -36,15 +36,7 @@ CREATE TABLE users (
 	id               bigint       GENERATED ALWAYS AS IDENTITY PRIMARY KEY CHECK (id >= 1 AND id < 1000000000000),
 	-- The username with its preferred casing
 	username         username     NOT NULL,
-	-- An argon2 PHC string. hash_password writes argon2id with a 16-byte salt and a 32-byte tag;
-	-- verify_password also checks argon2d and argon2i, and salts and tags of other lengths.
-	-- The CHECK admits the form that verify_password parses (version 19; m, t, and p in that
-	-- order, written without leading zeros; and a salt and a tag, each nonempty canonical base64
-	-- without padding, in which the bits after the last whole byte are 0) and refuses a cost of
-	-- 0, so that a mistyped string or a hash from another scheme is refused when written, rather
-	-- than at each of the user's logins. verify_password can still throw on a hash that the
-	-- CHECK admits, as the CHECK does not bound the costs, compare m with p (node:crypto needs
-	-- m >= 8 * p), or require a salt of at least 8 bytes and a tag of at least 4 bytes.
+	-- An argon2 PHC string
 	hashed_password  text         NOT NULL CHECK (hashed_password ~ (
 		'\A\$argon2(?:d|i|id)\$v=19\$m=[1-9][0-9]*,t=[1-9][0-9]*,p=[1-9][0-9]*'
 		'\$(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{4}|[A-Za-z0-9+/][AQgw]|[A-Za-z0-9+/]{2}[AEIMQUYcgkosw048])'
