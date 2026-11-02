@@ -22,7 +22,7 @@
 	"dependencies": {
 		"ayy": "^5.0.1",
 		"hash-wasm": "^4.12.0",
-		"postgres": "^4.0.0"
+		"postgres": "github:ludios/postgres#prime"
 	},
 	"peerDependencies": {
 		"@logtape/logtape": "^2.2.1",

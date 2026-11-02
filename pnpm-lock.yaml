@@ -30,8 +30,8 @@ importers:
         specifier: ^4.12.0
         version: 4.12.0
       postgres:
-        specifier: ^4.0.0
-        version: 4.0.0
+        specifier: github:ludios/postgres#prime
+        version: https://codeload.github.com/ludios/postgres/tar.gz/2279b5d51f4e4ad92b0c7119632916f66bb4e9cd
     devDependencies:
       '@sveltejs/kit':
         specifier: ^3.1.1
@@ -1051,8 +1051,9 @@ packages:
     resolution: {integrity: sha512-LJlKCCAUFKOuZxipUdYw1NzIITEsPcgyOG9LkvRJvuKj/bRzbuRY0ARXvL0pWGpsZvn8jku+LMep2eU0seHp8g==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postgres@4.0.0:
-    resolution: {integrity: sha512-kBh8qXtcvvIAc00DftQyOxz7M/3Zxww1tRMXZPLzipNXXl5PIzHml+9zB3Mrge2U8ldc0WF1ZdLp1iYQi7Kh3A==}
+  postgres@https://codeload.github.com/ludios/postgres/tar.gz/2279b5d51f4e4ad92b0c7119632916f66bb4e9cd:
+    resolution: {gitHosted: true, integrity: sha512-T+AjGSWDIsSyAF4y46O7PLTGjkd11AYSdpW3qabsrpTZaFL4qdLDgIYRcgYJ+Uin5VCpinnfsg22hIP4sHEjIw==, tarball: https://codeload.github.com/ludios/postgres/tar.gz/2279b5d51f4e4ad92b0c7119632916f66bb4e9cd}
+    version: 4.0.0
     engines: {node: '>=20'}
 
   prelude-ls@1.2.1:
@@ -2071,7 +2072,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.2
 
-  postgres@4.0.0: {}
+  postgres@https://codeload.github.com/ludios/postgres/tar.gz/2279b5d51f4e4ad92b0c7119632916f66bb4e9cd: {}
 
   prelude-ls@1.2.1:
     optional: true
