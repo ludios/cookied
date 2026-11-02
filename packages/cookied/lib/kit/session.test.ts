@@ -176,11 +176,11 @@ describe("SessionKit against PostgreSQL", () => {
 		expect(JSON.stringify(records.map((r) => [r.message, r.properties]))).not.toContain(secret);
 	});
 
-	it("refuses a wrong password and an unknown user", async () => {
+	it("refuses a wrong password and an unknown user, with one answer that doesn't tell which", async () => {
 		const cookies = new FakeCookies();
 		const login = kit.make_login_action(() => false);
-		expect(await login(login_event(cookies, "alice", "wrong"))).toEqual({ error: "incorrect password" });
-		expect(await login(login_event(cookies, "bob", "pw"))).toEqual({ error: "no such user" });
+		expect(await login(login_event(cookies, "alice", "wrong"))).toEqual({ error: "incorrect username or password" });
+		expect(await login(login_event(cookies, "bob", "pw"))).toEqual({ error: "incorrect username or password" });
 		expect(cookies.getAll()).toEqual([]);
 	});
 
@@ -195,7 +195,7 @@ describe("SessionKit against PostgreSQL", () => {
 		const check_ms = performance.now() - start;
 
 		start = performance.now();
-		expect(await kit.make_login_action(() => false)(login_event(new FakeCookies(), "bob", "pw"))).toEqual({ error: "no such user" });
+		expect(await kit.make_login_action(() => false)(login_event(new FakeCookies(), "bob", "pw"))).toEqual({ error: "incorrect username or password" });
 		// Half, to allow for noise: without the check, the answer takes about a millisecond
 		expect(performance.now() - start).toBeGreaterThan(check_ms / 2);
 	});

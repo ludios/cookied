@@ -118,13 +118,14 @@ export class SessionKit {
             const user = users.length === 1 && users[0].username.toLowerCase() === form_username.toLowerCase() ? users[0] : null;
             // Even with no such user, so that the time taken doesn't tell whether the user exists
             const password_is_correct = await verify_password(form_password, user?.hashed_password ?? null);
+            // One answer for both, so that it doesn't tell whether the user exists
             if (!user) {
                 logger.info("no such user {form_username}", { form_username });
-                return { error: "no such user" };
+                return { error: "incorrect username or password" };
             }
             if (!password_is_correct) {
                 logger.info("incorrect password provided by {form_username}", { form_username });
-                return { error: "incorrect password" };
+                return { error: "incorrect username or password" };
             }
             // Create a new session in the database
             A(password_is_correct); // Sanity check
