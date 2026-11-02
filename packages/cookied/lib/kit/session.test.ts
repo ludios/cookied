@@ -9,6 +9,7 @@ import type { Sql } from "postgres";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Config } from "../db/config.js";
 import { type MinimizedDatabaseSession, SessionsQuery } from "../db/session.js";
+import { verify_password } from "../password.js";
 import { SessionCookie } from "../session.js";
 import { default_sql, int8_to_number } from "../util.js";
 import { SessionKit } from "./session.js";
@@ -181,6 +182,17 @@ describe("SessionKit against PostgreSQL", () => {
 		expect(await login(login_event(cookies, "alice", "wrong"))).toEqual({ error: "incorrect password" });
 		expect(await login(login_event(cookies, "bob", "pw"))).toEqual({ error: "no such user" });
 		expect(cookies.getAll()).toEqual([]);
+	});
+
+	it("spends as long on an unknown user as on checking a password against the decoy hash", async () => {
+		let start = performance.now();
+		await verify_password("pw", null);
+		const check_ms = performance.now() - start;
+
+		start = performance.now();
+		expect(await kit.make_login_action(() => false)(login_event(new FakeCookies(), "bob", "pw"))).toEqual({ error: "no such user" });
+		// Half, to allow for noise: without the check, the answer takes about a millisecond
+		expect(performance.now() - start).toBeGreaterThan(check_ms / 2);
 	});
 
 	it("finds no session for a cookie with the wrong secret, and clears the cookie", async () => {

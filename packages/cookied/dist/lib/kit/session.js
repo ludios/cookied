@@ -1,7 +1,7 @@
 // Model-output: Claude Opus 5.5
 import { A } from "ayy";
-import { argon2Verify } from "hash-wasm";
 import { SessionsQuery } from "../db/session.js";
+import { verify_password } from "../password.js";
 import { BadSessionCookieError, SessionCookie } from "../session.js";
 import { int8_to_number, throw_if_gt1 } from "../util.js";
 import { getLogger } from "@logtape/logtape";
@@ -106,15 +106,13 @@ export class SessionKit {
 					WHERE LOWER(username) = ${form_username.toLowerCase()}
 				`);
             // Sanity-check the row from the database: ensure username match
-            if (!(users.length && users[0].username.toLowerCase() === form_username.toLowerCase())) {
+            const user = users.length === 1 && users[0].username.toLowerCase() === form_username.toLowerCase() ? users[0] : null;
+            // Even with no such user, so that the time taken doesn't tell whether the user exists
+            const password_is_correct = await verify_password(form_password, user?.hashed_password ?? null);
+            if (!user) {
                 logger.info("no such user {form_username}", { form_username });
                 return { error: "no such user" };
             }
-            const user = users[0];
-            const password_is_correct = await argon2Verify({
-                password: form_password,
-                hash: user.hashed_password,
-            });
             if (!password_is_correct) {
                 logger.info("incorrect password provided by {form_username}", { form_username });
                 return { error: "incorrect password" };
