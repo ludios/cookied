@@ -4,6 +4,9 @@
 	"description": "monorepo for cookied and a demo site in SvelteKit",
 	"private": true,
 	"type": "module",
+	"scripts": {
+		"test": "pnpm -r test"
+	},
 	"devDependencies": {
 		"@logtape/lint": "^2.2.3",
 		"@types/node": "^26.1.0",
