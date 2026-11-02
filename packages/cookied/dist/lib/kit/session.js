@@ -1,4 +1,3 @@
-// Model-output: Claude Opus 5.5
 import { A } from "ayy";
 import { SessionsQuery } from "../db/session.js";
 import { TooManyPasswordChecksError, verify_password } from "../password.js";

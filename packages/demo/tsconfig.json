@@ -1,4 +1,3 @@
-// Model-output: Claude Opus 5.5
 {
 	"extends": "$app/tsconfig",
 	"include": ["src", "*"],

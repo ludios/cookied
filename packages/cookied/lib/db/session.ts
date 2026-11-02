@@ -1,5 +1,3 @@
-// Model-output: Claude Opus 5.5
-
 import crypto from "node:crypto";
 import type { Sql } from "postgres";
 import type { SessionCookie } from "../session.js";

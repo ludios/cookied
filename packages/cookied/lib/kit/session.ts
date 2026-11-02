@@ -1,5 +1,3 @@
-// Model-output: Claude Opus 5.5
-
 import type { Cookies, RequestEvent } from "@sveltejs/kit";
 import { A } from "ayy";
 import { type MinimizedDatabaseSession, SessionsQuery } from "../db/session.js";

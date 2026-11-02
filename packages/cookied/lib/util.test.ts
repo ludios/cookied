@@ -1,5 +1,3 @@
-// Model-output: Claude Opus 5.5
-
 import { AssertionError } from "ayy";
 import { describe, expect, it } from "vitest";
 import { int8_to_number } from "./util.js";

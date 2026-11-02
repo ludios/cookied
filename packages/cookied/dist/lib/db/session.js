@@ -1,4 +1,3 @@
-// Model-output: Claude Opus 5.5
 import crypto from "node:crypto";
 import { get_one_row, int8_to_number, throw_if_gt1 } from "../util.js";
 /**

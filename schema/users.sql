@@ -1,5 +1,3 @@
--- Model-output: Claude Opus 5.5
-
 -- Restrict to valid DNS labels, just in case one needs per-user subdomains later
 -- Restrict to 31 characters instead of 63 because that is too many
 CREATE DOMAIN username AS text

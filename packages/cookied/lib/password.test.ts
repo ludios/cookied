@@ -1,5 +1,3 @@
-// Model-output: Claude Opus 5.5
-
 import { configure, getConsoleSink, type LogRecord, reset } from "@logtape/logtape";
 import * as fc from "fast-check";
 import { argon2Verify, argon2d, argon2i, argon2id } from "hash-wasm";

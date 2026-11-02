@@ -1,5 +1,3 @@
-// Model-output: Claude Opus 5.5
-
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { configure, getConsoleSink, type LogRecord, reset } from "@logtape/logtape";

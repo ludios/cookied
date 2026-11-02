@@ -1,4 +1,3 @@
-// Model-output: Claude Opus 5.5
 // Users' passwords, for users.hashed_password. hash_password writes argon2id in PHC string
 // format, with RFC 9106 §4's second recommended parameters (m = 64 MiB, t = 3, p = 4), a
 // 16-byte salt, and a 32-byte tag. verify_password also checks a hash with other parameters,

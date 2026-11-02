@@ -1,5 +1,3 @@
-// Model-output: Claude Opus 5.5
-
 import { inspect } from "node:util";
 import { A } from "ayy";
 import postgres, { type Sql } from "postgres";

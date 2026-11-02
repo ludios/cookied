@@ -1,5 +1,3 @@
-// Model-output: Claude Opus 5.5
-
 // What `pnpm build` compiles into dist/: everything that tsconfig.json checks, except tests
 {
 	"extends": "./tsconfig.json",
