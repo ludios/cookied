@@ -59,14 +59,15 @@ export class TooManyPasswordChecksError extends Error {
  * Checks passwords against argon2 PHC strings in worker threads, so that a check doesn't stall
  * the calling thread for its ~100 ms of synchronous WebAssembly. Each worker runs one check at a
  * time and keeps about 64 MiB once it has run one. Workers start when checks need them, and an
- * idle worker doesn't keep the process alive.
+ * idle worker doesn't keep the process alive. Between calls, a check waits only while every
+ * worker is busy and there is no room for another worker.
  */
 export class PasswordChecker {
     #max_running;
     #max_waiting;
     #slots = new Set();
     #waiting = [];
-    /** The checks refused since the last check that was accepted */
+    /** The checks refused since the waiting checks last ran out, for the log */
     #refused = 0;
     /**
      * @param max_running the most checks that run at once, each in its own worker thread
@@ -89,32 +90,25 @@ export class PasswordChecker {
     check(password, hash) {
         return new Promise((resolve, reject) => {
             const job = { request: { password, hash }, resolve, reject };
-            const slot = this.#idle_slot();
-            if (!slot && this.#waiting.length >= this.#max_waiting) {
+            const can_start = this.#idle_slot() !== null || this.#slots.size < this.#max_running;
+            if (!can_start && this.#waiting.length >= this.#max_waiting) {
                 this.#refuse(job);
                 return;
             }
-            if (this.#refused > 0) {
-                logger.info("accepting password checks again, after refusing {refused}", { refused: this.#refused });
-                this.#refused = 0;
-            }
-            if (slot) {
-                this.#start(slot, job);
-            }
-            else {
-                this.#waiting.push(job);
-            }
+            this.#waiting.push(job);
+            this.#dispatch();
         });
     }
-    /** @returns an idle worker, a new one if there is room for it, or null if every worker is busy */
+    /** @returns a worker that is running no check, or null if there is none */
     #idle_slot() {
         for (const slot of this.#slots) {
             if (!slot.job) {
                 return slot;
             }
         }
-        return this.#slots.size < this.#max_running ? this.#spawn() : null;
+        return null;
     }
+    /** @returns a new worker, idle and in #slots */
     #spawn() {
         const slot = { worker: new Worker(WORKER_URL), job: null };
         slot.worker.on("message", (reply) => this.#finish(slot, reply));
@@ -123,51 +117,94 @@ export class PasswordChecker {
         this.#slots.add(slot);
         return slot;
     }
-    #start(slot, job) {
-        A.is(slot.job, null);
-        slot.job = job;
-        // Keep the process alive until the check answers
-        slot.worker.ref();
-        // oxlint-disable-next-line unicorn/require-post-message-target-origin -- a Worker's postMessage takes no origin
-        slot.worker.postMessage(job.request);
+    /**
+     * Starts waiting checks, in the order they came, on idle workers and on new workers while
+     * there is room for them. Called also from workers' event listeners, so it must not throw.
+     */
+    #dispatch() {
+        while (this.#waiting.length > 0) {
+            let slot = this.#idle_slot();
+            if (!slot && this.#slots.size < this.#max_running) {
+                try {
+                    slot = this.#spawn();
+                }
+                catch (e) {
+                    // Such as when the system refuses another thread
+                    const error = e instanceof Error ? e : new Error(String(e));
+                    logger.error("could not start a password worker, failing a check: {error}", { error });
+                    this.#waiting.shift()?.reject(error);
+                    continue;
+                }
+            }
+            if (!slot) {
+                return;
+            }
+            const job = this.#waiting.shift();
+            A(job);
+            A.is(slot.job, null);
+            slot.job = job;
+            // Keep the process alive until the check answers
+            slot.worker.ref();
+            // oxlint-disable-next-line unicorn/require-post-message-target-origin -- a Worker's postMessage takes no origin
+            slot.worker.postMessage(job.request);
+        }
+        if (this.#refused > 0) {
+            logger.info("{refused} password checks were refused before the waiting checks ran out", { refused: this.#refused });
+            this.#refused = 0;
+        }
     }
+    /**
+     * @param slot  the worker that answered
+     * @param reply its answer to the check that it was running
+     */
     #finish(slot, reply) {
+        // The worker was dropped (an answer can come after its "error"), and its check failed then
+        if (!this.#slots.has(slot)) {
+            return;
+        }
         const job = slot.job;
-        A(job, "a password worker answered with no check running");
+        if (!job) {
+            logger.error("a password worker answered when it was running no check; ignoring the answer");
+            return;
+        }
         slot.job = null;
+        slot.worker.unref();
         if ("error" in reply) {
             job.reject(new Error(reply.error));
         }
         else {
             job.resolve(reply.matches);
         }
-        const next = this.#waiting.shift();
-        if (next) {
-            this.#start(slot, next);
-        }
-        else {
-            slot.worker.unref();
-        }
+        this.#dispatch();
     }
-    /** Drops a worker that failed or exited, failing its check */
+    /**
+     * Drops a worker that failed or exited, fails the check that it was running, if any, and
+     * starts a waiting check on a new worker in its place.
+     *
+     * @param slot  the worker
+     * @param error what its check fails with
+     */
     #lose(slot, error) {
         // A worker that fails emits "error" and then "exit"
         if (!this.#slots.delete(slot)) {
             return;
         }
-        logger.error("a password worker failed, failing its check: {error}", { error });
-        slot.job?.reject(error);
-        void slot.worker.terminate();
-        // Replace the worker if a check is waiting, so that checks still run `max_running` at a
-        // time, and run at all if it was the only worker
-        const next = this.#waiting.shift();
-        if (next) {
-            this.#start(this.#spawn(), next);
+        const job = slot.job;
+        slot.job = null;
+        if (job) {
+            logger.error("a password worker failed, failing its check: {error}", { error });
+            job.reject(error);
         }
+        else {
+            logger.error("an idle password worker failed: {error}", { error });
+        }
+        void slot.worker.terminate();
+        this.#dispatch();
     }
+    /** Rejects `job`, and logs the first refusal since the waiting checks last ran out */
     #refuse(job) {
         if (this.#refused === 0) {
-            logger.warn("{running} password checks are running and {waiting} are waiting, the most allowed; refusing more until one can wait", { running: this.#slots.size, waiting: this.#waiting.length });
+            logger.warn("refusing password checks: {running} are running and {waiting} are waiting, the most allowed", { running: this.#slots.size, waiting: this.#waiting.length });
         }
         this.#refused += 1;
         job.reject(new TooManyPasswordChecksError(this.#slots.size, this.#waiting.length));

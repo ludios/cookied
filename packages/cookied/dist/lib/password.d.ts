@@ -20,7 +20,8 @@ export declare class TooManyPasswordChecksError extends Error {
  * Checks passwords against argon2 PHC strings in worker threads, so that a check doesn't stall
  * the calling thread for its ~100 ms of synchronous WebAssembly. Each worker runs one check at a
  * time and keeps about 64 MiB once it has run one. Workers start when checks need them, and an
- * idle worker doesn't keep the process alive.
+ * idle worker doesn't keep the process alive. Between calls, a check waits only while every
+ * worker is busy and there is no room for another worker.
  */
 export declare class PasswordChecker {
     #private;

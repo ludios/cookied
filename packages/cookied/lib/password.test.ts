@@ -1,5 +1,6 @@
 // Model-output: Claude Opus 5.5
 
+import { configure, getConsoleSink, type LogRecord, reset } from "@logtape/logtape";
 import { describe, expect, it } from "vitest";
 import { DECOY_HASH, hash_password, PasswordChecker, TooManyPasswordChecksError, verify_password } from "./password.js";
 
@@ -57,6 +58,28 @@ describe("PasswordChecker", () => {
 		expect(results.slice(0, 2)).toEqual([{ status: "fulfilled", value: true }, { status: "fulfilled", value: false }]);
 		expect(results[2]).toMatchObject({ status: "rejected", reason: expect.any(TooManyPasswordChecksError) });
 		expect(await checker.check("pw", hash)).toBe(true);
+	});
+
+	it("logs a run of refusals once when it starts, and once when the waiting checks run out", async () => {
+		const checker = new PasswordChecker(1, 0);
+		const records: LogRecord[] = [];
+		await configure({
+			sinks:   { memory: (record) => records.push(record), console: getConsoleSink() },
+			loggers: [
+				{ category: ["cookied"], lowestLevel: "debug", sinks: ["memory"] },
+				{ category: ["logtape", "meta"], lowestLevel: "warning", sinks: ["console"] },
+			],
+		});
+		try {
+			const results = await Promise.allSettled(Array.from({ length: 5 }, () => checker.check("pw", DECOY_HASH)));
+			expect(results.filter((r) => r.status === "rejected")).toHaveLength(4);
+		} finally {
+			await reset();
+		}
+		expect(records.map((r) => [r.level, r.properties])).toEqual([
+			["warning", { running: 1, waiting: 0 }],
+			["info", { refused: 4 }],
+		]);
 	});
 
 	it("rejects a hash that is not an argon2 PHC string, and goes on checking", async () => {
