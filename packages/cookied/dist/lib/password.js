@@ -6,20 +6,22 @@
 // against DECOY_HASH for no user, and so tells that the user exists.
 //
 // Both compute argon2 with node:crypto, on libuv's threadpool rather than on the calling thread.
-import { argon2, argon2Sync, randomBytes, timingSafeEqual } from "node:crypto";
+import * as crypto from "node:crypto";
 import { promisify } from "node:util";
 import { getLogger } from "@logtape/logtape";
 import { A } from "ayy";
 const logger = getLogger(["cookied"]);
-// node:crypto computes argon2 only in a Node.js built with OpenSSL 3.2 or later, and otherwise
-// throws; every login would then fail, so better that the application fails to start
+// node:crypto has argon2 from Node.js 24.7.0, and computes it only in a Node.js built with
+// OpenSSL 3.2 or later. Without it, every login would fail, so better that the application fails
+// to start, with this message (which is why node:crypto is imported as a namespace: a named
+// import of an export that is missing fails before any code runs)
 try {
-    argon2Sync("argon2id", { message: "password", nonce: Buffer.alloc(8), parallelism: 1, tagLength: 4, memory: 8, passes: 1 });
+    crypto.argon2Sync("argon2id", { message: "password", nonce: Buffer.alloc(8), parallelism: 1, tagLength: 4, memory: 8, passes: 1 });
 }
 catch (e) {
-    throw new Error("cookied needs node:crypto's argon2, which Node.js 24.7.0 or later has when built with OpenSSL 3.2 or later", { cause: e });
+    throw new Error("node:crypto could not compute argon2, which cookied needs; Node.js 24.7.0 or later can, when built with OpenSSL 3.2 or later (see the cause)", { cause: e });
 }
-const argon2_async = promisify(argon2);
+const argon2_async = promisify(crypto.argon2);
 /**
  * @param password   as typed
  * @param inputs     what to compute the tag from, besides `password`
@@ -89,7 +91,7 @@ let last_hash = Promise.resolve();
  */
 export async function hash_password(password) {
     A.gte(password.length, 1);
-    const inputs = { ...HASH_PARAMETERS, salt: randomBytes(16) };
+    const inputs = { ...HASH_PARAMETERS, salt: crypto.randomBytes(16) };
     const tag = last_hash.then(() => argon2_tag(password, inputs, 32));
     last_hash = tag.catch(() => undefined);
     return format_phc({ ...inputs, tag: await tag });
@@ -148,7 +150,7 @@ export class PasswordChecker {
         const parsed = parse_phc(hash);
         await this.#turn();
         try {
-            return timingSafeEqual(await argon2_tag(password, parsed, parsed.tag.length), parsed.tag);
+            return crypto.timingSafeEqual(await argon2_tag(password, parsed, parsed.tag.length), parsed.tag);
         }
         finally {
             this.#end();
