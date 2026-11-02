@@ -24,8 +24,8 @@ importers:
         specifier: ^2.2.1
         version: 2.4.2
       ayy:
-        specifier: ^4.1.0
-        version: 4.1.0
+        specifier: ^5.0.1
+        version: 5.0.1
       hash-wasm:
         specifier: ^4.12.0
         version: 4.12.0
@@ -320,6 +320,10 @@ packages:
 
   '@logtape/logtape@2.4.2':
     resolution: {integrity: sha512-YJyC1gEMgWmTqJTRtKkjgasEbi8/0gP7Dj8n6bL46gQIAhpTY8uXJ+1QYMOgF5asotlGMvy3G7ejXUe45Yd1MQ==}
+
+  '@ludios/node-inspect-extracted@3.3.4':
+    resolution: {integrity: sha512-pRn7EVjC1UAZ0MzE0WEk6lhoQOsXtVPfwPJcZYTjaXr/QTW/9uLA0QkL5H4kCeKpujx3xwJnCHUZBiZRl38NaA==}
+    engines: {node: '>=14'}
 
   '@oxc-project/types@0.156.0':
     resolution: {integrity: sha512-1Duyg48TdJNdyhEB8Xn1L36bT9Pv6GUtlKjHxOys8xkaF/rQq3XJE+bAurSK/AgIz5mGFsb77cn9Pb20+WCScw==}
@@ -669,9 +673,9 @@ packages:
     resolution: {integrity: sha512-qIj0G9wZbMGNLjLmg1PT6v2mE9AH2zlnADJD/2tC6E00hgmhUOfEB6greHPAfLRSufHqROIUTkw6E+M3lH0PTQ==}
     engines: {node: '>= 0.4'}
 
-  ayy@4.1.0:
-    resolution: {integrity: sha512-SKSsZh415xVJGMWYSeL/x1LskHJV87+ywuTRDMr40gSGL0wi/qqeJmolwqgqyN61MMSH3CkcfwQ7UF9CVOzrjg==}
-    engines: {node: '>= 14'}
+  ayy@5.0.1:
+    resolution: {integrity: sha512-8HHuPzhcbrRgzCYTDG8qagW/dhV6dJaBqP5d/BwyvMNRAgQFB5g0vOTSXAK1b1W4sPjGG0VgEbwkMbbzPtWjjA==}
+    engines: {node: '>= 14.13.1'}
 
   balanced-match@4.0.4:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
@@ -1438,6 +1442,8 @@ snapshots:
 
   '@logtape/logtape@2.4.2': {}
 
+  '@ludios/node-inspect-extracted@3.3.4': {}
+
   '@oxc-project/types@0.156.0': {}
 
   '@oxlint/binding-android-arm-eabi@1.72.0':
@@ -1670,7 +1676,9 @@ snapshots:
 
   axobject-query@4.1.0: {}
 
-  ayy@4.1.0: {}
+  ayy@5.0.1:
+    dependencies:
+      '@ludios/node-inspect-extracted': 3.3.4
 
   balanced-match@4.0.4:
     optional: true
