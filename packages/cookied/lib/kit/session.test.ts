@@ -176,6 +176,33 @@ describe("SessionKit against PostgreSQL", () => {
 		expect(JSON.stringify(records.map((r) => [r.message, r.properties]))).not.toContain(secret);
 	});
 
+	it("logs a username field that matches no user only under [\"cookied\", \"form\"], as it may hold a password", async () => {
+		const login = kit.make_login_action(() => false);
+		const records: LogRecord[] = [];
+		await configure({
+			sinks:   { memory: (record) => records.push(record), console: getConsoleSink() },
+			loggers: [
+				{ category: ["cookied"], lowestLevel: "debug", sinks: ["memory"] },
+				{ category: ["logtape", "meta"], lowestLevel: "warning", sinks: ["console"] },
+			],
+		});
+		try {
+			// A password typed into the username field: one that a username could be, and one that it couldn't
+			await login(login_event(new FakeCookies(), "hunter2", "pw"));
+			await login(login_event(new FakeCookies(), "hunter2!", "pw"));
+			await login(login_event(new FakeCookies(), "hunter2", ""));
+			await login(login_event(new FakeCookies(), "alice", "wrong"));
+		} finally {
+			await reset();
+		}
+		const form = records.filter((r) => r.category.join(".") === "cookied.form");
+		const outside_form = records.filter((r) => !form.includes(r));
+		expect(form).toHaveLength(3);
+		expect(JSON.stringify(outside_form.map((r) => [r.message, r.properties]))).not.toContain("hunter2");
+		// The user's username as the database has it, not the field as typed
+		expect(outside_form.map((r) => r.properties)).toContainEqual({ username: "Alice" });
+	});
+
 	it("refuses a wrong password and an unknown user, with one answer that doesn't tell which", async () => {
 		const cookies = new FakeCookies();
 		const login = kit.make_login_action(() => false);

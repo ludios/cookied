@@ -10,6 +10,12 @@ import { type Int8, int8_to_number, throw_if_gt1 } from "../util.js";
 import { getLogger } from "@logtape/logtape";
 
 const logger = getLogger(["cookied"]);
+/**
+ * For the log lines that hold a login form's username field as typed, when no user's username
+ * matches it: such a field sometimes holds a password typed into the wrong field. An application
+ * can leave this category out of its logs and keep the rest of "cookied".
+ */
+const form_logger = getLogger(["cookied", "form"]);
 
 export type CookieOptions = {
 	// Name for the session cookie, e.g. "s" or some other name unique for the domain
@@ -152,19 +158,19 @@ export class SessionKit {
 
 			// Bail out early if possible, since users.sql doesn't allow empty usernames
 			if (!form_username) {
-				logger.info("empty username {form_username}", { form_username });
+				logger.info("empty username");
 				return { error: "empty username" };
 			}
 
 			if (!form_password) {
-				logger.info("empty password provided by {form_username}", { form_username });
+				form_logger.info("empty password provided by {form_username}", { form_username });
 				return { error: "empty password" };
 			}
 
 			// No user has such a username, so the answer can come at once without telling anything.
 			// It also keeps out what PostgreSQL would reject, such as a NUL character.
 			if (!POSSIBLE_USERNAME.test(form_username)) {
-				logger.info("impossible username {form_username}", { form_username });
+				form_logger.info("impossible username {form_username}", { form_username });
 				return { error: "incorrect username or password" };
 			}
 
@@ -186,11 +192,11 @@ export class SessionKit {
 			const password_is_correct = await verify_password(form_password, user?.hashed_password ?? null);
 			// One answer for both, so that it doesn't tell whether the user exists
 			if (!user) {
-				logger.info("no such user {form_username}", { form_username });
+				form_logger.info("no such user {form_username}", { form_username });
 				return { error: "incorrect username or password" };
 			}
 			if (!password_is_correct) {
-				logger.info("incorrect password provided by {form_username}", { form_username });
+				logger.info("incorrect password for {username}", { username: user.username });
 				return { error: "incorrect username or password" };
 			}
 
