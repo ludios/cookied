@@ -6,44 +6,120 @@
 // as a PHC string carries its own, but such a check takes longer or shorter than the check
 // against DECOY_HASH for no user, and so tells that the user exists.
 //
-// verify_password checks passwords in worker threads (see PasswordChecker), started from
-// password_worker.js next to this file, so an application must load this file from cookied's
-// dist/ rather than bundle it.
+// Both compute argon2 with node:crypto, on libuv's threadpool rather than on the calling thread.
 
-import { randomBytes } from "node:crypto";
-import { existsSync } from "node:fs";
-import { Worker } from "node:worker_threads";
+import { type Argon2Algorithm, argon2, argon2Sync, randomBytes, timingSafeEqual } from "node:crypto";
+import { promisify } from "node:util";
 import { getLogger } from "@logtape/logtape";
 import { A } from "ayy";
-import { argon2id } from "hash-wasm";
-import type { CheckReply, CheckRequest } from "./password_worker.js";
 
 const logger = getLogger(["cookied"]);
 
-/**
- * The file that a PasswordChecker's workers run: password_worker.js in dist/, or
- * password_worker.ts when this file runs from lib/ in cookied's tests (Node strips its types)
- */
-const WORKER_URL = new URL(import.meta.url.endsWith(".ts") ? "./password_worker.ts" : "./password_worker.js", import.meta.url);
-// A bundler that copies this file elsewhere leaves the worker's file behind, and then every
-// check would fail; better that the application fails to start
-A(existsSync(WORKER_URL), () => `${WORKER_URL.href} is missing; load cookied from its dist/ rather than bundling it`);
+// node:crypto computes argon2 only in a Node.js built with OpenSSL 3.2 or later, and otherwise
+// throws; every login would then fail, so better that the application fails to start
+try {
+	argon2Sync("argon2id", { message: "password", nonce: Buffer.alloc(8), parallelism: 1, tagLength: 4, memory: 8, passes: 1 });
+} catch (e) {
+	throw new Error("cookied needs node:crypto's argon2, which Node.js 24.7.0 or later has when built with OpenSSL 3.2 or later", { cause: e });
+}
+
+const argon2_async = promisify(argon2);
+
+/** What argon2 computes a tag from, besides the password and the tag's length */
+type Argon2Inputs = {
+	algorithm: Argon2Algorithm;
+	/** The memory cost, in KiB */
+	m:    number;
+	/** The passes over the memory */
+	t:    number;
+	/** The lanes, which OpenSSL computes in threads of their own when it can start threads */
+	p:    number;
+	salt: Buffer;
+};
+
+/** What an argon2 PHC string holds: a tag, and what argon2 computed it from besides the password */
+type Argon2Hash = Argon2Inputs & { tag: Buffer };
 
 /**
- * @param password as typed; must not be empty (hash-wasm throws on an empty password)
- * @returns the PHC string of `password`, hashed with a fresh salt, on the calling thread
+ * @param password   as typed
+ * @param inputs     what to compute the tag from, besides `password`
+ * @param tag_length the tag's length in bytes
+ * @returns argon2's tag, computed on libuv's threadpool
+ */
+async function argon2_tag(password: string, inputs: Argon2Inputs, tag_length: number): Promise<Buffer> {
+	return await argon2_async(inputs.algorithm, {
+		message:     password,
+		nonce:       inputs.salt,
+		parallelism: inputs.p,
+		tagLength:   tag_length,
+		memory:      inputs.m,
+		passes:      inputs.t,
+	});
+}
+
+/** @returns `bytes` in base64 without padding, as a PHC string holds bytes */
+function unpadded_base64(bytes: Buffer): string {
+	return bytes.toString("base64").replace(/=+$/, "");
+}
+
+/**
+ * @returns `hash` as a PHC string, written as hash-wasm and the argon2 reference implementation
+ *          write one: version 19 (0x13), the one version that node:crypto computes, and the
+ *          parameters in the order m, t, p
+ */
+function format_phc(hash: Argon2Hash): string {
+	return `$${hash.algorithm}$v=19$m=${hash.m},t=${hash.t},p=${hash.p}$${unpadded_base64(hash.salt)}$${unpadded_base64(hash.tag)}`;
+}
+
+const PHC_PATTERN = /^\$(argon2d|argon2i|argon2id)\$v=19\$m=(\d+),t=(\d+),p=(\d+)\$([A-Za-z0-9+/]+)\$([A-Za-z0-9+/]+)$/;
+
+/**
+ * @param phc a PHC string, such as a user's users.hashed_password
+ * @returns the hash that `phc` holds
+ * @throws Error if format_phc would not write `phc` for any hash
+ */
+function parse_phc(phc: string): Argon2Hash {
+	const match = PHC_PATTERN.exec(phc);
+	const hash = match && {
+		algorithm: match[1] as Argon2Algorithm,
+		m:         Number(match[2]),
+		t:         Number(match[3]),
+		p:         Number(match[4]),
+		salt:      Buffer.from(match[5], "base64"),
+		tag:       Buffer.from(match[6], "base64"),
+	};
+	// The hash, written back, differs from `phc` also when `phc` has a number with a leading zero
+	// or one too large for a double, or base64 whose last character has bits that make no byte
+	if (!hash || format_phc(hash) !== phc) {
+		// Without the string itself, which shouldn't go into logs
+		throw new Error("the hash is not an argon2 PHC string in the form that cookied writes: v=19, the parameters in the order m, t, p, and base64 without padding");
+	}
+	return hash;
+}
+
+/**
+ * The parameters that hash_password hashes with. A hash or check with them takes ~30–60 ms on
+ * a recent x86-64 CPU, and holds 64 MiB until it ends.
+ */
+const HASH_PARAMETERS = { algorithm: "argon2id", m: 64 * 1024, t: 3, p: 4 } as const;
+
+/**
+ * The hash that hash_password started last, settled or not. Each hash waits for the one before
+ * it, so that hashing holds at most one threadpool thread and 64 MiB at once.
+ */
+let last_hash: Promise<unknown> = Promise.resolve();
+
+/**
+ * @param password as typed; must not be empty, as verify_password refuses an empty password
+ * @returns the PHC string of `password`, hashed with a fresh salt on libuv's threadpool, after
+ *          the hashes that hash_password started before it
  */
 export async function hash_password(password: string): Promise<string> {
 	A.gte(password.length, 1);
-	return await argon2id({
-		password,
-		salt:        randomBytes(16),
-		parallelism: 4,
-		iterations:  3,
-		memorySize:  64 * 1024,
-		hashLength:  32,
-		outputType:  "encoded",
-	});
+	const inputs: Argon2Inputs = { ...HASH_PARAMETERS, salt: randomBytes(16) };
+	const tag = last_hash.then(() => argon2_tag(password, inputs, 32));
+	last_hash = tag.catch(() => undefined);
+	return format_phc({ ...inputs, tag: await tag });
 }
 
 /**
@@ -64,34 +140,26 @@ export class TooManyPasswordChecksError extends Error {
 	}
 }
 
-/** A check that PasswordChecker.check was asked for, with the functions that settle its promise */
-type Job = {
-	request: CheckRequest;
-	resolve: (matches: boolean) => void;
-	reject:  (error: Error) => void;
-};
-
-/** A worker thread, and the check that it is running, or null if it is idle */
-type Slot = { worker: Worker; job: Job | null };
-
 /**
- * Checks passwords against argon2 PHC strings in worker threads, so that a check doesn't stall
- * the calling thread for its ~100 ms of synchronous WebAssembly. Each worker runs one check at a
- * time and keeps about 64 MiB once it has run one. Workers start when checks need them, and an
- * idle worker doesn't keep the process alive. Between calls, a check waits only while every
- * worker is busy and there is no room for another worker.
+ * Checks passwords against argon2 PHC strings on libuv's threadpool, so that a check doesn't
+ * stall the calling thread. A running check holds one of the threadpool's threads, which file
+ * system calls and dns.lookup also need (libuv has 4 unless UV_THREADPOOL_SIZE says otherwise);
+ * the hash's memory cost; and, when OpenSSL can start threads, a CPU core for each lane. A check
+ * waits only while `max_running` checks are running, and starts in its turn as one ends.
  */
 export class PasswordChecker {
 	readonly #max_running: number;
 	readonly #max_waiting: number;
-	readonly #slots   = new Set<Slot>();
-	readonly #waiting: Job[] = [];
+	/** The checks that are running */
+	#running = 0;
+	/** For each waiting check, in the order they came: the function that lets it run */
+	readonly #waiting: Array<() => void> = [];
 	/** The checks refused since the waiting checks last ran out, for the log */
 	#refused = 0;
 
 	/**
-	 * @param max_running the most checks that run at once, each in its own worker thread
-	 * @param max_waiting the most checks that wait for a worker; a check beyond these is refused
+	 * @param max_running the most checks that run at once
+	 * @param max_waiting the most checks that wait to run; a check beyond these is refused
 	 */
 	constructor(max_running: number, max_waiting: number) {
 		A.gte(max_running, 1);
@@ -105,144 +173,64 @@ export class PasswordChecker {
 	 * @param hash     an argon2 PHC string
 	 * @returns whether `password` matches `hash`. Rejects at once with TooManyPasswordChecksError
 	 *          if `max_running` checks are running and `max_waiting` more are waiting; or with an
-	 *          Error if `hash` is not an argon2 PHC string, or if the worker running the check
-	 *          failed.
+	 *          Error if `hash` is not an argon2 PHC string in the form that hash_password writes,
+	 *          or if node:crypto refuses the parameters that `hash` holds.
 	 */
-	check(password: string, hash: string): Promise<boolean> {
-		return new Promise((resolve, reject) => {
-			const job: Job = { request: { password, hash }, resolve, reject };
-			const can_start = this.#idle_slot() !== null || this.#slots.size < this.#max_running;
-			if (!can_start && this.#waiting.length >= this.#max_waiting) {
-				this.#refuse(job);
-				return;
-			}
-			this.#waiting.push(job);
-			this.#dispatch();
-		});
-	}
-
-	/** @returns a worker that is running no check, or null if there is none */
-	#idle_slot(): Slot | null {
-		for (const slot of this.#slots) {
-			if (!slot.job) {
-				return slot;
-			}
+	async check(password: string, hash: string): Promise<boolean> {
+		const parsed = parse_phc(hash);
+		await this.#turn();
+		try {
+			return timingSafeEqual(await argon2_tag(password, parsed, parsed.tag.length), parsed.tag);
+		} finally {
+			this.#end();
 		}
-		return null;
-	}
-
-	/** @returns a new worker, idle and in #slots */
-	#spawn(): Slot {
-		const slot: Slot = { worker: new Worker(WORKER_URL), job: null };
-		slot.worker.on("message", (reply: CheckReply) => this.#finish(slot, reply));
-		slot.worker.on("error", (error) => this.#lose(slot, error instanceof Error ? error : new Error(String(error))));
-		slot.worker.on("exit", (code) => this.#lose(slot, new Error(`password worker exited with code ${code}`)));
-		this.#slots.add(slot);
-		return slot;
 	}
 
 	/**
-	 * Starts waiting checks, in the order they came, on idle workers and on new workers while
-	 * there is room for them. Called also from workers' event listeners, so it must not throw.
+	 * @returns once the caller may run a check, which must then call #end when it ends. Rejects at
+	 *          once with TooManyPasswordChecksError if there is no room to run or wait.
 	 */
-	#dispatch() {
-		while (this.#waiting.length > 0) {
-			let slot = this.#idle_slot();
-			if (!slot && this.#slots.size < this.#max_running) {
-				try {
-					slot = this.#spawn();
-				} catch (e) {
-					// Such as when the system refuses another thread
-					const error = e instanceof Error ? e : new Error(String(e));
-					logger.error("could not start a password worker, failing a check: {error}", { error });
-					this.#waiting.shift()?.reject(error);
-					continue;
-				}
-			}
-			if (!slot) {
-				return;
-			}
-			const job = this.#waiting.shift();
-			A(job);
-			A.is(slot.job, null);
-			slot.job = job;
-			// Keep the process alive until the check answers
-			slot.worker.ref();
-			// oxlint-disable-next-line unicorn/require-post-message-target-origin -- a Worker's postMessage takes no origin
-			slot.worker.postMessage(job.request);
+	#turn(): Promise<void> {
+		if (this.#running < this.#max_running) {
+			A.is(this.#waiting.length, 0);
+			this.#running += 1;
+			return Promise.resolve();
 		}
-		if (this.#refused > 0) {
+		if (this.#waiting.length >= this.#max_waiting) {
+			if (this.#refused === 0) {
+				logger.warn("refusing password checks: {running} are running and {waiting} are waiting, the most allowed", { running: this.#running, waiting: this.#waiting.length });
+			}
+			this.#refused += 1;
+			return Promise.reject(new TooManyPasswordChecksError(this.#running, this.#waiting.length));
+		}
+		return new Promise((resolve) => this.#waiting.push(resolve));
+	}
+
+	/** Gives the ending check's place to the first waiting check, if there is one */
+	#end() {
+		const next = this.#waiting.shift();
+		if (next) {
+			next();
+		} else {
+			this.#running -= 1;
+			A.gte(this.#running, 0);
+		}
+		if (this.#waiting.length === 0 && this.#refused > 0) {
 			logger.info("{refused} password checks were refused before the waiting checks ran out", { refused: this.#refused });
 			this.#refused = 0;
 		}
 	}
-
-	/**
-	 * @param slot  the worker that answered
-	 * @param reply its answer to the check that it was running
-	 */
-	#finish(slot: Slot, reply: CheckReply) {
-		// The worker was dropped (an answer can come after its "error"), and its check failed then
-		if (!this.#slots.has(slot)) {
-			return;
-		}
-		const job = slot.job;
-		if (!job) {
-			logger.error("a password worker answered when it was running no check; ignoring the answer");
-			return;
-		}
-		slot.job = null;
-		slot.worker.unref();
-		if ("error" in reply) {
-			job.reject(new Error(reply.error));
-		} else {
-			job.resolve(reply.matches);
-		}
-		this.#dispatch();
-	}
-
-	/**
-	 * Drops a worker that failed or exited, fails the check that it was running, if any, and
-	 * starts a waiting check on a new worker in its place.
-	 *
-	 * @param slot  the worker
-	 * @param error what its check fails with
-	 */
-	#lose(slot: Slot, error: Error) {
-		// A worker that fails emits "error" and then "exit"
-		if (!this.#slots.delete(slot)) {
-			return;
-		}
-		const job = slot.job;
-		slot.job = null;
-		if (job) {
-			logger.error("a password worker failed, failing its check: {error}", { error });
-			job.reject(error);
-		} else {
-			logger.error("an idle password worker failed: {error}", { error });
-		}
-		void slot.worker.terminate();
-		this.#dispatch();
-	}
-
-	/** Rejects `job`, and logs the first refusal since the waiting checks last ran out */
-	#refuse(job: Job) {
-		if (this.#refused === 0) {
-			logger.warn("refusing password checks: {running} are running and {waiting} are waiting, the most allowed", { running: this.#slots.size, waiting: this.#waiting.length });
-		}
-		this.#refused += 1;
-		job.reject(new TooManyPasswordChecksError(this.#slots.size, this.#waiting.length));
-	}
 }
 
 /**
- * verify_password's checks: at most 2 at once, as each holds a CPU core for ~100 ms, and at
- * most 8 waiting, so that the last one waits ~0.5 s
+ * verify_password's checks: at most 2 at once, which leaves 2 of libuv's 4 threadpool threads
+ * free (1 while hash_password hashes), and at most 8 waiting, so that the last one waits for 4
+ * checks' time
  */
 const checker = new PasswordChecker(2, 8);
 
 /**
- * @param password        as typed; must not be empty (hash-wasm throws on an empty password)
+ * @param password        as typed; must not be empty
  * @param hashed_password the user's users.hashed_password, an argon2 PHC string; or null if
  *                        there is no such user
  * @returns whether `password` is the user's password. With no user, the answer is false,
@@ -250,7 +238,8 @@ const checker = new PasswordChecker(2, 8);
  *          as it does for a user whose hash hash_password made.
  * @throws AssertionError if `password` is empty; TooManyPasswordChecksError if 2 checks are
  *         running and 8 more are waiting; or an Error if `hashed_password` is not an argon2
- *         PHC string
+ *         PHC string in the form that hash_password writes, or if node:crypto refuses the
+ *         parameters that it holds
  */
 export async function verify_password(password: string, hashed_password: string | null): Promise<boolean> {
 	A.gte(password.length, 1);

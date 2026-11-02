@@ -19,9 +19,11 @@
 			]
 		}
 	},
+	"engines": {
+		"node": ">=24.7.0"
+	},
 	"dependencies": {
-		"ayy": "^5.0.1",
-		"hash-wasm": "^4.12.0"
+		"ayy": "^5.0.1"
 	},
 	"peerDependencies": {
 		"@logtape/logtape": "^2.2.1",
@@ -35,6 +37,8 @@
 	},
 	"devDependencies": {
 		"@sveltejs/kit": "^3.1.1",
+		"fast-check": "^4.10.2",
+		"hash-wasm": "^4.12.0",
 		"postgres": "github:ludios/postgres#prime",
 		"tsx": "^4.23.0",
 		"typescript": "^6.0.3",

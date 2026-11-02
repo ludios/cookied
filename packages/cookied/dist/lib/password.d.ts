@@ -1,6 +1,7 @@
 /**
- * @param password as typed; must not be empty (hash-wasm throws on an empty password)
- * @returns the PHC string of `password`, hashed with a fresh salt, on the calling thread
+ * @param password as typed; must not be empty, as verify_password refuses an empty password
+ * @returns the PHC string of `password`, hashed with a fresh salt on libuv's threadpool, after
+ *          the hashes that hash_password started before it
  */
 export declare function hash_password(password: string): Promise<string>;
 /**
@@ -17,17 +18,17 @@ export declare class TooManyPasswordChecksError extends Error {
     constructor(running: number, waiting: number);
 }
 /**
- * Checks passwords against argon2 PHC strings in worker threads, so that a check doesn't stall
- * the calling thread for its ~100 ms of synchronous WebAssembly. Each worker runs one check at a
- * time and keeps about 64 MiB once it has run one. Workers start when checks need them, and an
- * idle worker doesn't keep the process alive. Between calls, a check waits only while every
- * worker is busy and there is no room for another worker.
+ * Checks passwords against argon2 PHC strings on libuv's threadpool, so that a check doesn't
+ * stall the calling thread. A running check holds one of the threadpool's threads, which file
+ * system calls and dns.lookup also need (libuv has 4 unless UV_THREADPOOL_SIZE says otherwise);
+ * the hash's memory cost; and, when OpenSSL can start threads, a CPU core for each lane. A check
+ * waits only while `max_running` checks are running, and starts in its turn as one ends.
  */
 export declare class PasswordChecker {
     #private;
     /**
-     * @param max_running the most checks that run at once, each in its own worker thread
-     * @param max_waiting the most checks that wait for a worker; a check beyond these is refused
+     * @param max_running the most checks that run at once
+     * @param max_waiting the most checks that wait to run; a check beyond these is refused
      */
     constructor(max_running: number, max_waiting: number);
     /**
@@ -35,13 +36,13 @@ export declare class PasswordChecker {
      * @param hash     an argon2 PHC string
      * @returns whether `password` matches `hash`. Rejects at once with TooManyPasswordChecksError
      *          if `max_running` checks are running and `max_waiting` more are waiting; or with an
-     *          Error if `hash` is not an argon2 PHC string, or if the worker running the check
-     *          failed.
+     *          Error if `hash` is not an argon2 PHC string in the form that hash_password writes,
+     *          or if node:crypto refuses the parameters that `hash` holds.
      */
     check(password: string, hash: string): Promise<boolean>;
 }
 /**
- * @param password        as typed; must not be empty (hash-wasm throws on an empty password)
+ * @param password        as typed; must not be empty
  * @param hashed_password the user's users.hashed_password, an argon2 PHC string; or null if
  *                        there is no such user
  * @returns whether `password` is the user's password. With no user, the answer is false,
@@ -49,6 +50,7 @@ export declare class PasswordChecker {
  *          as it does for a user whose hash hash_password made.
  * @throws AssertionError if `password` is empty; TooManyPasswordChecksError if 2 checks are
  *         running and 8 more are waiting; or an Error if `hashed_password` is not an argon2
- *         PHC string
+ *         PHC string in the form that hash_password writes, or if node:crypto refuses the
+ *         parameters that it holds
  */
 export declare function verify_password(password: string, hashed_password: string | null): Promise<boolean>;

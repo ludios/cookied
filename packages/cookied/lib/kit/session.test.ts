@@ -100,7 +100,8 @@ describe("SessionKit against PostgreSQL", () => {
 			sql,
 		};
 		kit = new SessionKit(config, { name: cookie_name, path: "/", secure: true });
-		// Cheap parameters, as this hash protects nothing
+		// Cheap parameters, as this hash protects nothing; made by hash-wasm, as cookied before
+		// 6.0.0 made hashes, so that logging in also checks that such a hash still works
 		const salt = new Uint8Array(16);
 		const hashed_password = await argon2id({ password: "pw", salt, parallelism: 1, iterations: 1, memorySize: 8, hashLength: 32, outputType: "encoded" });
 		const [user] = await sql`
@@ -225,8 +226,6 @@ describe("SessionKit against PostgreSQL", () => {
 	});
 
 	it("spends as long on an unknown user as on checking a password against the decoy hash", async () => {
-		// The first check in a process takes longer, as it sets up hash-wasm
-		await verify_password("pw", null);
 		let start = performance.now();
 		await verify_password("pw", null);
 		const check_ms = performance.now() - start;
