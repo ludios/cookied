@@ -1,6 +1,7 @@
 // Model-output: Claude Opus 5.5
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { configure, getConsoleSink, reset } from "@logtape/logtape";
 import { argon2id } from "hash-wasm";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { SessionsQuery } from "../db/session.js";
@@ -117,6 +118,32 @@ describe("SessionKit against PostgreSQL", () => {
         expect(await sessions.find_by_ids([id])).toMatchObject([{ id, user_id }]);
         expect(await sessions.find_minimized_by_user_id(user_id)).toMatchObject([{ id, user_id }]);
         await sessions.delete_by_ids_and_user_id([id], user_id);
+    });
+    it("logs no secret of a session cookie, also from cookies that it rejects", async () => {
+        const cookies = new FakeCookies();
+        expect(await kit.make_login_action(() => false)(login_event(cookies, "alice", "pw"))).toEqual({ success: true });
+        const cookie = cookies.get(cookie_name);
+        const secret = cookie.split(" ")[1];
+        const records = [];
+        await configure({
+            sinks: { memory: (record) => records.push(record), console: getConsoleSink() },
+            loggers: [
+                { category: ["cookied"], lowestLevel: "debug", sinks: ["memory"] },
+                { category: ["logtape", "meta"], lowestLevel: "warning", sinks: ["console"] },
+            ],
+        });
+        try {
+            // A valid cookie, one that fails to parse, and one that names no session
+            for (const value of [cookie, `${cookie} `, `999999 ${secret}`]) {
+                cookies.set(cookie_name, value);
+                await session_from_hook(kit, cookies);
+            }
+        }
+        finally {
+            await reset();
+        }
+        expect(records.length).toBeGreaterThanOrEqual(5);
+        expect(JSON.stringify(records.map((r) => [r.message, r.properties]))).not.toContain(secret);
     });
     it("refuses a wrong password and an unknown user", async () => {
         const cookies = new FakeCookies();

@@ -82,7 +82,8 @@ export class SessionKit {
 	make_parse_session_cookie_hook(got_session: GotSessionCallback): Handle {
 		return async ({ event, resolve }) => {
 			const cookies = event.cookies;
-			logger.debug("cookies from client {all}", () => ({ all: cookies.getAll() }));
+			// Only the names: a value may be a secret, such as that of our session cookie
+			logger.debug("names of cookies from client {names}", () => ({ names: cookies.getAll().map((c) => c.name) }));
 			const s_cookie = cookies.get(this.#cookie_options.name);
 			if (!s_cookie) {
 				return resolve(event);
@@ -92,7 +93,7 @@ export class SessionKit {
 				cookie = SessionCookie.parse(s_cookie);
 			} catch (e) {
 				if (e instanceof BadSessionCookieError) {
-					logger.warn("session cookie {s_cookie} failed to parse, clearing it", { s_cookie });
+					logger.warn("session cookie failed to parse ({reason}), clearing it", { reason: e.message });
 					this.#clear_session_cookie(cookies);
 				} else {
 					throw e;
@@ -103,7 +104,7 @@ export class SessionKit {
 			}
 			const session = await this.#sessions_query.validate(cookie);
 			if (!session) {
-				logger.warn("session cookie {cookie} references session not in database, clearing cookie", { cookie });
+				logger.warn("session cookie names session {id}, which is not in the database or has another secret; clearing the cookie", { id: cookie.id });
 				this.#clear_session_cookie(cookies);
 				return resolve(event);
 			}
