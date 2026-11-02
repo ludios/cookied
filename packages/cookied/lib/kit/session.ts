@@ -189,6 +189,7 @@ export class SessionKit {
 			A(password_is_correct); // Sanity check
 			const user_agent = event.request.headers.get("User-Agent");
 			const { id, secret } = await this.#sessions_query.create(int8_to_number(user.id), user_agent || "");
+			logger.info("{username} logged in, in new session {id}", { username: user.username, id });
 
 			// Set a session cookie in the HTTP response
 			const s_cookie = new SessionCookie(id, secret);
@@ -204,6 +205,7 @@ export class SessionKit {
 			if (session) {
 				// Remove the session from the database
 				await this.#sessions_query.delete_by_ids_and_user_id([session.id], session.user_id);
+				logger.info("{username} logged out of session {id}", { username: session.username, id: session.id });
 			} else {
 				logger.info("no session to log out");
 			}
