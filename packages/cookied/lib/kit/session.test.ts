@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { configure, getConsoleSink, type LogRecord, reset } from "@logtape/logtape";
 import type { Cookies, RequestEvent } from "@sveltejs/kit";
 import { argon2id } from "hash-wasm";
-import type { Sql } from "postgres";
+import { PostgresError, type Sql } from "postgres";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Config } from "../db/config.js";
 import { type MinimizedDatabaseSession, SessionsQuery } from "../db/session.js";
@@ -81,6 +81,26 @@ async function session_from_hook(kit: SessionKit, cookies: FakeCookies): Promise
 	return found;
 }
 
+/**
+ * @param hash a string that may or may not be an argon2 PHC string
+ * @returns whether verify_password gets past parsing `hash`, whether or not node:crypto then
+ *          computes argon2 with the parameters that `hash` holds
+ */
+async function verify_password_parses(hash: string): Promise<boolean> {
+	try {
+		await verify_password("pw", hash);
+	} catch (e) {
+		if (e instanceof Error && e.message.startsWith("the hash is not an argon2 PHC string")) {
+			return false;
+		}
+		// node:crypto refuses some parameters (such as a salt shorter than 8 bytes) after parsing
+		if (!(e instanceof RangeError && "code" in e && e.code === "ERR_OUT_OF_RANGE")) {
+			throw e;
+		}
+	}
+	return true;
+}
+
 describe("SessionKit against PostgreSQL", () => {
 	let sql: Sql;
 	let config: Config;
@@ -119,6 +139,26 @@ describe("SessionKit against PostgreSQL", () => {
 		await sql?.end();
 		vi.unstubAllEnvs();
 	});
+
+	let hashers = 0;
+
+	/**
+	 * Insert a user with `hashed_password`, under a username of its own. The user stays.
+	 *
+	 * @returns whether users.sql admits `hashed_password`
+	 */
+	async function admits(hashed_password: string): Promise<boolean> {
+		hashers += 1;
+		try {
+			await sql`INSERT INTO cookied.users (username, hashed_password) VALUES (${`hasher-${hashers}`}, ${hashed_password})`;
+		} catch (e) {
+			if (e instanceof PostgresError && e.constraint_name === "users_hashed_password_check") {
+				return false;
+			}
+			throw e;
+		}
+		return true;
+	}
 
 	it("logs in, finds the session by its cookie, and logs out", async () => {
 		const cookies = new FakeCookies();
@@ -255,5 +295,47 @@ describe("SessionKit against PostgreSQL", () => {
 		cookies.set(cookie_name, new SessionCookie(id, Buffer.alloc(16)).toString());
 		expect(await session_from_hook(kit, cookies)).toBeNull();
 		expect(cookies.get(cookie_name)).toBeUndefined();
+	});
+
+	it("admits into users.hashed_password an algorithm, version, and costs that verify_password parses, but no cost of 0", async () => {
+		// [hash, whether verify_password parses it, whether users.sql admits it]
+		const cases: Array<[string, boolean, boolean]> = [
+			["$argon2id$v=19$m=16,t=2,p=1$AAAAAAAAAAA$AAAAAA",            true,  true],
+			["$argon2i$v=19$m=16,t=2,p=1$AAAAAAAAAAA$AAAAAA",             true,  true],
+			["$argon2d$v=19$m=16,t=2,p=1$AAAAAAAAAAA$AAAAAA",             true,  true],
+			// node:crypto refuses a cost of 0, but only after verify_password parses it
+			["$argon2id$v=19$m=0,t=2,p=1$AAAAAAAAAAA$AAAAAA",             true,  false],
+			["$argon2id$v=19$m=16,t=0,p=1$AAAAAAAAAAA$AAAAAA",            true,  false],
+			["$argon2id$v=19$m=16,t=2,p=0$AAAAAAAAAAA$AAAAAA",            true,  false],
+			["$argon2$v=19$m=16,t=2,p=1$AAAAAAAAAAA$AAAAAA",              false, false],
+			["$argon2id$v=16$m=16,t=2,p=1$AAAAAAAAAAA$AAAAAA",            false, false],
+			["$argon2id$m=16,t=2,p=1$AAAAAAAAAAA$AAAAAA",                 false, false],
+			["$argon2id$v=19$t=2,m=16,p=1$AAAAAAAAAAA$AAAAAA",            false, false],
+			["$argon2id$v=19$m=16,t=02,p=1$AAAAAAAAAAA$AAAAAA",           false, false],
+			["$argon2id$v=19$m=16,t=2,p=1,keyid=AAAA$AAAAAAAAAAA$AAAAAA", false, false],
+			["$argon2id$v=19$m=16,t=2,p=1$AAAAAAAAAAA$AAAAAA\n",          false, false],
+			["$2b$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW", false, false],
+			["",                                                           false, false],
+		];
+		for (const [hash, parses, admitted] of cases) {
+			expect([hash, await verify_password_parses(hash), await admits(hash)]).toEqual([hash, parses, admitted]);
+		}
+	});
+
+	it("admits into users.hashed_password a salt and a tag that verify_password parses, and refuses any other", async () => {
+		// Base64 of every length past a multiple of 4, with or without whole groups of 4 before,
+		// each with every character in place of its last character, and after it
+		const fields = [""];
+		for (const length of [1, 2, 3, 8, 9, 10]) {
+			const base64 = Buffer.alloc(length).toString("base64").replace(/=+$/, "");
+			for (const character of "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=-") {
+				fields.push(base64.slice(0, -1) + character, base64 + character);
+			}
+		}
+		for (const field of fields) {
+			for (const hash of [`$argon2id$v=19$m=16,t=2,p=1$${field}$AAAAAA`, `$argon2id$v=19$m=16,t=2,p=1$AAAAAAAAAAA$${field}`]) {
+				expect([hash, await admits(hash)]).toEqual([hash, await verify_password_parses(hash)]);
+			}
+		}
 	});
 });
