@@ -2,6 +2,5 @@ packages:
   - 'packages/*'
 allowBuilds:
   esbuild: set this to true or false
-  svelte-preprocess: set this to true or false
 minimumReleaseAgeExclude:
   - '@logtape/logtape@2.2.1'
