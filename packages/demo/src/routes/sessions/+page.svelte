@@ -43,7 +43,7 @@
 				{#each data.my_sessions as { id, birth_time, user_agent_seen_first } (id)}
 					<tr>
 						<td class="session_button">
-							{#if id == data.session.id}
+							{#if id === data.session.id}
 								Current session
 							{:else}
 								<button onclick={() => remove_session(id)}>Remove</button>

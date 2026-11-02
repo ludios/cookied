@@ -3,7 +3,7 @@ import { A } from "ayy";
 import { argon2Verify } from "hash-wasm";
 import { SessionsQuery } from "../db/session.js";
 import { BadSessionCookieError, SessionCookie } from "../session.js";
-import { throw_if_gt1 } from "../util.js";
+import { int8_to_number, throw_if_gt1 } from "../util.js";
 import { getLogger } from "@logtape/logtape";
 const logger = getLogger(["cookied"]);
 export class SessionKit {
@@ -100,11 +100,11 @@ export class SessionKit {
                 return { error: "empty password" };
             }
             const sql = this.#database_config.sql;
-            const users = throw_if_gt1((await sql `
+            const users = throw_if_gt1(await sql `
 					SELECT id, username, hashed_password
 					FROM ${sql(this.#database_config.identifiers.users)}
 					WHERE LOWER(username) = ${form_username.toLowerCase()}
-				`));
+				`);
             // Sanity-check the row from the database: ensure username match
             if (!(users.length && users[0].username.toLowerCase() === form_username.toLowerCase())) {
                 logger.info("no such user {form_username}", { form_username });
@@ -122,7 +122,7 @@ export class SessionKit {
             // Create a new session in the database
             A(password_is_correct); // Sanity check
             const user_agent = event.request.headers.get("User-Agent");
-            const { id, secret } = await this.#sessions_query.create(user.id, user_agent || "");
+            const { id, secret } = await this.#sessions_query.create(int8_to_number(user.id), user_agent || "");
             // Set a session cookie in the HTTP response
             const s_cookie = new SessionCookie(id, secret);
             this.#set_session_cookie(event.cookies, s_cookie);

@@ -1,6 +1,7 @@
 // Model-output: Claude Opus 5.5
 
 import { inspect } from "node:util";
+import { A } from "ayy";
 import postgres, { type Sql } from "postgres";
 import { getLogger } from "@logtape/logtape";
 
@@ -25,6 +26,21 @@ export function get_one_row<T>(rows: ReadonlyArray<T>): T {
 		throw Error(`expected 1 row, got ${rows.length} rows: ${inspect(rows)}`);
 	}
 	return rows[0];
+}
+
+// The value of a bigint column, as a postgres.js pool returns it: decimal text by
+// default, or a number or a BigInt if the application has configured the pool to
+// parse bigint columns that way.
+export type Int8 = string | number | bigint;
+
+/**
+ * @param int8 the value of a bigint column
+ * @returns the same integer as a number
+ */
+export function int8_to_number(int8: Int8): number {
+	const n = Number(int8);
+	A(Number.isSafeInteger(n), () => `expected a bigint value that is a safe integer, got ${inspect(int8)}`);
+	return n;
 }
 
 export function dbg<T>(obj: T): T {

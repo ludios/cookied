@@ -6,7 +6,7 @@ import { argon2Verify } from "hash-wasm";
 import { type MinimizedDatabaseSession, SessionsQuery } from "../db/session.js";
 import type { Config } from "../db/config.js";
 import { BadSessionCookieError, SessionCookie } from "../session.js";
-import { throw_if_gt1 } from "../util.js";
+import { type Int8, int8_to_number, throw_if_gt1 } from "../util.js";
 import { getLogger } from "@logtape/logtape";
 
 const logger = getLogger(["cookied"]);
@@ -138,11 +138,11 @@ export class SessionKit {
 
 			const sql = this.#database_config.sql;
 			const users = throw_if_gt1(
-				(await sql`
+				await sql<Array<{ id: Int8; username: string; hashed_password: string }>>`
 					SELECT id, username, hashed_password
 					FROM ${sql(this.#database_config.identifiers.users)}
 					WHERE LOWER(username) = ${form_username.toLowerCase()}
-				`) satisfies ReadonlyArray<{ id: number; username: string; hashed_password: string }>,
+				`,
 			);
 			// Sanity-check the row from the database: ensure username match
 			if (!(users.length && users[0].username.toLowerCase() === form_username.toLowerCase())) {
@@ -163,7 +163,7 @@ export class SessionKit {
 			// Create a new session in the database
 			A(password_is_correct); // Sanity check
 			const user_agent = event.request.headers.get("User-Agent");
-			const { id, secret } = await this.#sessions_query.create(user.id, user_agent || "");
+			const { id, secret } = await this.#sessions_query.create(int8_to_number(user.id), user_agent || "");
 
 			// Set a session cookie in the HTTP response
 			const s_cookie = new SessionCookie(id, secret);

@@ -101,7 +101,7 @@ describe("SessionKit against PostgreSQL", () => {
         expect(session).toMatchObject({ id: SessionCookie.parse(cookie).id, user_id, username: "Alice", user_agent_seen_first: "UA/1" });
         expect(session.birth_time).toBeInstanceOf(Date);
         const sessions = new SessionsQuery(config);
-        expect((await sessions.find_minimized_by_user_id(user_id)).map((s) => Number(s.id))).toEqual([session.id]);
+        expect(await sessions.find_minimized_by_user_id(user_id)).toMatchObject([{ id: session.id, user_id }]);
         await kit.make_logout_action()({ cookies: cookies, locals: { session } });
         expect(cookies.get(cookie_name)).toBeUndefined();
         expect(await sessions.find_minimized_by_user_id(user_id)).toEqual([]);
@@ -109,6 +109,14 @@ describe("SessionKit against PostgreSQL", () => {
         cookies.set(cookie_name, cookie);
         expect(await session_from_hook(kit, cookies)).toBeNull();
         expect(cookies.get(cookie_name)).toBeUndefined();
+    });
+    it("returns the ids of sessions and users as numbers", async () => {
+        const sessions = new SessionsQuery(config);
+        const { id } = await sessions.create(user_id, "UA/2");
+        expect(id).toBeTypeOf("number");
+        expect(await sessions.find_by_ids([id])).toMatchObject([{ id, user_id }]);
+        expect(await sessions.find_minimized_by_user_id(user_id)).toMatchObject([{ id, user_id }]);
+        await sessions.delete_by_ids_and_user_id([id], user_id);
     });
     it("refuses a wrong password and an unknown user", async () => {
         const cookies = new FakeCookies();
