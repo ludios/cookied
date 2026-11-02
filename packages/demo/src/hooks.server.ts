@@ -1,6 +1,6 @@
 import { SessionKit } from "cookied/lib/kit/session.js";
 import { database_config } from "./util";
-import type { Handle } from '@sveltejs/kit';
+import type { Handle } from '@sveltejs/kit/hooks';
 import { cookie_options_from_env } from "./util";
 import { getLogger } from "@logtape/logtape";
 

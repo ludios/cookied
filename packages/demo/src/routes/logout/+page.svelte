@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { invalidateAll } from "$app/navigation";
+	import { refreshAll } from "$app/navigation";
 	import { onMount } from "svelte";
 
 	onMount(() => {
 		// Prevent Header from showing stale session data
-		invalidateAll();
+		refreshAll();
 	});
 </script>
 

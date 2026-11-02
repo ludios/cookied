@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from "./$types";
-	import { invalidateAll } from "$app/navigation";
+	import { refreshAll } from "$app/navigation";
 	import { getLogger } from "@logtape/logtape";
 
 	const logger = getLogger(["demo"]);
@@ -12,7 +12,7 @@
 		if (!obj.success) {
 			logger.warn(`DELETE /api/sessions/${id} returned {obj}`, { obj });
 		}
-		await invalidateAll();
+		await refreshAll();
 	}
 </script>
 

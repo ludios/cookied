@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from "$app/navigation";
+	import { refreshAll } from "$app/navigation";
 	import { onMount } from "svelte";
 	import type { PageProps } from "./$types";
 
@@ -7,7 +7,7 @@
 
 	onMount(() => {
 		// Prevent Header from showing stale session data
-		invalidateAll();
+		refreshAll();
 	});
 </script>
 
