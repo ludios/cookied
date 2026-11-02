@@ -237,6 +237,18 @@ describe("SessionKit against PostgreSQL", () => {
 		expect(performance.now() - start).toBeGreaterThan(check_ms / 2);
 	});
 
+	it("answers that there are too many login attempts when verify_password has as many checks as it allows", async () => {
+		const login = kit.make_login_action(() => false);
+		// verify_password runs 2 checks at once and keeps 8 waiting, so 12 at once leave 2 refused
+		const answers = await Promise.all(Array.from({ length: 12 }, () => login(login_event(new FakeCookies(), "bob", "pw"))));
+		const refused = answers.filter((answer) => "error" in answer && answer.error === "too many login attempts at once");
+		expect(refused.length).toBeGreaterThanOrEqual(1);
+		expect(answers.length - refused.length).toBeGreaterThanOrEqual(10);
+		for (const answer of answers) {
+			expect(answer).toBeOneOf([{ error: "too many login attempts at once" }, { error: "incorrect username or password" }]);
+		}
+	});
+
 	it("finds no session for a cookie with the wrong secret, and clears the cookie", async () => {
 		const cookies = new FakeCookies();
 		expect(await kit.make_login_action(() => false)(login_event(cookies, "alice", "pw"))).toEqual({ success: true });

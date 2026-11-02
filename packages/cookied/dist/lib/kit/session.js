@@ -1,7 +1,7 @@
 // Model-output: Claude Opus 5.5
 import { A } from "ayy";
 import { SessionsQuery } from "../db/session.js";
-import { verify_password } from "../password.js";
+import { TooManyPasswordChecksError, verify_password } from "../password.js";
 import { BadSessionCookieError, SessionCookie } from "../session.js";
 import { int8_to_number, throw_if_gt1 } from "../util.js";
 import { getLogger } from "@logtape/logtape";
@@ -137,7 +137,18 @@ export class SessionKit {
                 logger.warn("the database matched {form_username} to user {username}, whose username differs in more than case", { form_username, username: row.username });
             }
             // Even with no such user, so that the time taken doesn't tell whether the user exists
-            const password_is_correct = await verify_password(form_password, user?.hashed_password ?? null);
+            let password_is_correct;
+            try {
+                password_is_correct = await verify_password(form_password, user?.hashed_password ?? null);
+            }
+            catch (e) {
+                // verify_password's PasswordChecker logs when it starts and stops refusing checks,
+                // so this doesn't log each refusal
+                if (e instanceof TooManyPasswordChecksError) {
+                    return { error: "too many login attempts at once" };
+                }
+                throw e;
+            }
             // One answer for both, so that it doesn't tell whether the user exists
             if (!user) {
                 form_logger.info("no such user {form_username}", { form_username });

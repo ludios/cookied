@@ -17,12 +17,13 @@ type Handle = (input: {
 /**
  * What a login action answers: that the client is now logged in, or why not. One error says
  * both that no user has the username and that the password is wrong, so that the answer
- * doesn't tell whether the user exists.
+ * doesn't tell whether the user exists. "too many login attempts at once" says that the
+ * password went unchecked, because too many other passwords were being checked.
  */
 export type LoginResult = {
     success: true;
 } | {
-    error: "already logged in" | "empty username" | "empty password" | "incorrect username or password";
+    error: "already logged in" | "empty username" | "empty password" | "incorrect username or password" | "too many login attempts at once";
 };
 export declare class SessionKit {
     #private;
