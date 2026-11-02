@@ -11,9 +11,9 @@ import { getLogger } from "@logtape/logtape";
 
 const logger = getLogger(["cookied"]);
 /**
- * For the log lines that hold a login form's username field as typed, when no user's username
- * matches it: such a field sometimes holds a password typed into the wrong field. An application
- * can leave this category out of its logs and keep the rest of "cookied".
+ * For the log lines that hold a login form's username field as typed, which no user's username
+ * has (yet) been found to match: such a field sometimes holds a password typed into the wrong
+ * field. An application can leave this category out of its logs and keep the rest of "cookied".
  */
 const form_logger = getLogger(["cookied", "form"]);
 
@@ -186,7 +186,7 @@ export class SessionKit {
 			// Sanity-check the row from the database: ensure username match
 			const user = row?.username.toLowerCase() === form_username.toLowerCase() ? row : null;
 			if (row && !user) {
-				logger.warn("the database matched {form_username} to user {username}, whose username differs in more than case", { form_username, username: row.username });
+				logger.warn("the database matched a username field to user {username}, whose username differs from it in more than case", { username: row.username });
 			}
 
 			// Even with no such user, so that the time taken doesn't tell whether the user exists
@@ -194,8 +194,7 @@ export class SessionKit {
 			try {
 				password_is_correct = await verify_password(form_password, user?.hashed_password ?? null);
 			} catch (e) {
-				// verify_password's PasswordChecker logs when it starts and stops refusing checks,
-				// so this doesn't log each refusal
+				// Refused whoever the user is, so the answer doesn't tell whether the user exists
 				if (e instanceof TooManyPasswordChecksError) {
 					return { error: "too many login attempts at once" };
 				}
