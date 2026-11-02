@@ -29,13 +29,13 @@ importers:
       hash-wasm:
         specifier: ^4.12.0
         version: 4.12.0
-      postgres:
-        specifier: github:ludios/postgres#prime
-        version: https://codeload.github.com/ludios/postgres/tar.gz/2279b5d51f4e4ad92b0c7119632916f66bb4e9cd
     devDependencies:
       '@sveltejs/kit':
         specifier: ^3.1.1
         version: 3.1.1(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.3(@typescript-eslint/types@8.62.0))(vite@8.3.5(@types/node@26.1.0)(esbuild@0.28.1)(tsx@4.23.0)))(svelte@5.57.3(@typescript-eslint/types@8.62.0))(typescript@6.0.3)(vite@8.3.5(@types/node@26.1.0)(esbuild@0.28.1)(tsx@4.23.0))
+      postgres:
+        specifier: github:ludios/postgres#prime
+        version: https://codeload.github.com/ludios/postgres/tar.gz/2279b5d51f4e4ad92b0c7119632916f66bb4e9cd
       tsx:
         specifier: ^4.23.0
         version: 4.23.0
@@ -51,6 +51,9 @@ importers:
       cookied:
         specifier: workspace:^
         version: link:../cookied
+      postgres:
+        specifier: github:ludios/postgres#prime
+        version: https://codeload.github.com/ludios/postgres/tar.gz/2279b5d51f4e4ad92b0c7119632916f66bb4e9cd
     devDependencies:
       '@logtape/logtape':
         specifier: ^2.4.2
