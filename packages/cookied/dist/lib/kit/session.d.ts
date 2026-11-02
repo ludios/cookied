@@ -1,4 +1,4 @@
-import type { Cookies, Handle, RequestEvent } from "@sveltejs/kit";
+import type { Cookies, RequestEvent } from "@sveltejs/kit";
 import { type MinimizedDatabaseSession } from "../db/session.js";
 import type { Config } from "../db/config.js";
 export type CookieOptions = {
@@ -10,6 +10,10 @@ type GotSessionCallback = ({ session, event, }: {
     session: MinimizedDatabaseSession;
     event: RequestEvent;
 }) => void;
+type Handle = (input: {
+    event: RequestEvent;
+    resolve: (event: RequestEvent) => Response | Promise<Response>;
+}) => Promise<Response>;
 export declare class SessionKit {
     #private;
     constructor(database_config: Config, cookie_options: CookieOptions);

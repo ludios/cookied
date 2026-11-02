@@ -1,3 +1,4 @@
+// Model-output: Claude Opus 5.5
 import { A } from "ayy";
 import { argon2Verify } from "hash-wasm";
 import { SessionsQuery } from "../db/session.js";

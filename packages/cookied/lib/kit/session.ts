@@ -1,4 +1,6 @@
-import type { Cookies, Handle, RequestEvent } from "@sveltejs/kit";
+// Model-output: Claude Opus 5.5
+
+import type { Cookies, RequestEvent } from "@sveltejs/kit";
 import { A } from "ayy";
 import { argon2Verify } from "hash-wasm";
 import { type MinimizedDatabaseSession, SessionsQuery } from "../db/session.js";
@@ -25,6 +27,14 @@ type GotSessionCallback = ({
 	session: MinimizedDatabaseSession;
 	event: RequestEvent;
 }) => void;
+
+// A SvelteKit `handle` hook. SvelteKit 2 exports its type as `Handle` from
+// "@sveltejs/kit", and SvelteKit 3 exports it as `Handle` from "@sveltejs/kit/hooks";
+// a function of this type can be assigned to either of them.
+type Handle = (input: {
+	event: RequestEvent;
+	resolve: (event: RequestEvent) => Response | Promise<Response>;
+}) => Promise<Response>;
 
 export class SessionKit {
 	#database_config: Config;
