@@ -11,6 +11,7 @@
 // dist/ rather than bundle it.
 
 import { randomBytes } from "node:crypto";
+import { existsSync } from "node:fs";
 import { Worker } from "node:worker_threads";
 import { getLogger } from "@logtape/logtape";
 import { A } from "ayy";
@@ -24,6 +25,9 @@ const logger = getLogger(["cookied"]);
  * password_worker.ts when this file runs from lib/ in cookied's tests (Node strips its types)
  */
 const WORKER_URL = new URL(import.meta.url.endsWith(".ts") ? "./password_worker.ts" : "./password_worker.js", import.meta.url);
+// A bundler that copies this file elsewhere leaves the worker's file behind, and then every
+// check would fail; better that the application fails to start
+A(existsSync(WORKER_URL), () => `${WORKER_URL.href} is missing; load cookied from its dist/ rather than bundling it`);
 
 /**
  * @param password as typed; must not be empty (hash-wasm throws on an empty password)
