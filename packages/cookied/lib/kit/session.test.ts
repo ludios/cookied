@@ -82,9 +82,10 @@ async function session_from_hook(kit: SessionKit, cookies: FakeCookies): Promise
 }
 
 /**
- * @param hash a string that may or may not be an argon2 PHC string
- * @returns whether verify_password gets past parsing `hash`, whether or not node:crypto then
- *          computes argon2 with the parameters that `hash` holds
+ * @param hash a string that may or may not be an argon2 PHC string; if verify_password parses it,
+ *             it computes argon2 with the costs that `hash` holds, so they must be small
+ * @returns whether verify_password gets past parsing `hash`, also when node:crypto then refuses
+ *          the parameters that `hash` holds as out of range
  */
 async function verify_password_parses(hash: string): Promise<boolean> {
 	try {
@@ -323,15 +324,19 @@ describe("SessionKit against PostgreSQL", () => {
 			["",                                                           false, false],
 		];
 		for (const [hash, parses, admitted] of cases) {
-			expect([hash, await verify_password_parses(hash), await admits(hash)]).toEqual([hash, parses, admitted]);
+			const parsed = await verify_password_parses(hash);
+			const was_admitted = await admits(hash);
+			expect([hash, parsed, was_admitted]).toEqual([hash, parses, admitted]);
 		}
 	});
 
 	it("admits into users.hashed_password a salt and a tag that verify_password parses, and refuses any other", async () => {
-		// Base64 of every length past a multiple of 4, with or without whole groups of 4 before,
-		// each with every character in place of its last character, and after it
+		// The base64 of 0, 1, 2, 3, 8, 9, and 10 bytes, each with every character in place of its
+		// last character, and with every character after it: so fields of every length from 1 to
+		// 5 and from 11 to 15, which leave each remainder mod 4, with and without whole groups of
+		// 4 characters before the remainder
 		const fields = [""];
-		for (const length of [1, 2, 3, 8, 9, 10]) {
+		for (const length of [0, 1, 2, 3, 8, 9, 10]) {
 			const base64 = Buffer.alloc(length).toString("base64").replace(/=+$/, "");
 			for (const character of "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=-") {
 				fields.push(base64.slice(0, -1) + character, base64 + character);
@@ -339,7 +344,9 @@ describe("SessionKit against PostgreSQL", () => {
 		}
 		for (const field of fields) {
 			for (const hash of [`$argon2id$v=19$m=16,t=2,p=1$${field}$AAAAAA`, `$argon2id$v=19$m=16,t=2,p=1$AAAAAAAAAAA$${field}`]) {
-				expect([hash, await admits(hash)]).toEqual([hash, await verify_password_parses(hash)]);
+				const was_admitted = await admits(hash);
+				const parsed = await verify_password_parses(hash);
+				expect([hash, was_admitted]).toEqual([hash, parsed]);
 			}
 		}
 	});
