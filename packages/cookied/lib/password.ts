@@ -119,9 +119,10 @@ let last_hash: Promise<unknown> = Promise.resolve();
 export async function hash_password(password: string): Promise<string> {
 	A.gte(password.length, 1);
 	const inputs: Argon2Inputs = { ...HASH_PARAMETERS, salt: crypto.randomBytes(16) };
-	const tag = last_hash.then(() => argon2_tag(password, inputs, 32));
-	last_hash = tag.catch(() => undefined);
-	return format_phc({ ...inputs, tag: await tag });
+	const hashing = last_hash.then(() => argon2_tag(password, inputs, 32));
+	last_hash = hashing.catch(() => undefined);
+	const tag = await hashing;
+	return format_phc({ ...inputs, tag });
 }
 
 /**
@@ -182,7 +183,8 @@ export class PasswordChecker {
 		const parsed = parse_phc(hash);
 		await this.#turn();
 		try {
-			return crypto.timingSafeEqual(await argon2_tag(password, parsed, parsed.tag.length), parsed.tag);
+			const tag = await argon2_tag(password, parsed, parsed.tag.length);
+			return crypto.timingSafeEqual(tag, parsed.tag);
 		} finally {
 			this.#end();
 		}
