@@ -120,13 +120,16 @@ export class SessionKit {
                 return { error: "incorrect username or password" };
             }
             const sql = this.#database_config.sql;
-            const users = throw_if_gt1(await sql `
+            const row = throw_if_gt1(await sql `
 					SELECT id, username, hashed_password
 					FROM ${sql(this.#database_config.identifiers.users)}
 					WHERE LOWER(username) = ${form_username.toLowerCase()}
-				`);
+				`).at(0);
             // Sanity-check the row from the database: ensure username match
-            const user = users.length === 1 && users[0].username.toLowerCase() === form_username.toLowerCase() ? users[0] : null;
+            const user = row?.username.toLowerCase() === form_username.toLowerCase() ? row : null;
+            if (row && !user) {
+                logger.warn("the database matched {form_username} to user {username}, whose username differs in more than case", { form_username, username: row.username });
+            }
             // Even with no such user, so that the time taken doesn't tell whether the user exists
             const password_is_correct = await verify_password(form_password, user?.hashed_password ?? null);
             // One answer for both, so that it doesn't tell whether the user exists
